@@ -4,7 +4,7 @@ A self-hosted web portal that tracks the ISS and the Chinese Tiangong space stat
 
 ## Features
 
-- **Live map** (`iss.html`) — live ISS and Tiangong position on a world map, via server-side SGP4 orbit calculation
+- **Live map** (`index.html`) — home page: live ISS and Tiangong position on a world map, via server-side SGP4 orbit calculation
 - **NASA Open Data** (`nasa.html`) — APOD, space weather notifications, near-earth objects, EPIC Earth photos, Mars rover photos
 - **Artemis** (`artemis.html`) — mission timeline + live NASA Artemis blog RSS feed
 - **Space Weather** (`ruimteweer.html`) — explanation of space weather events/codes
@@ -88,8 +88,7 @@ space-tracker/
 ├── Dockerfile               Container image for the portal (alternative to systemd)
 ├── docker-compose.yml       Runs the portal via Docker
 ├── static/
-│   ├── index.html           Landing page
-│   ├── iss.html              Live ISS/Tiangong map
+│   ├── index.html           Live ISS/Tiangong map — also the home page
 │   ├── nasa.html             NASA Open Data
 │   ├── artemis.html          Artemis mission timeline + RSS feed
 │   ├── ruimteweer.html       Space weather code explanations
@@ -102,7 +101,7 @@ space-tracker/
 
 ## Usage
 
-Open `http://<host>:8082` in a browser for the landing page, or go straight to `/iss.html` for the map.
+Open `http://<host>:8082` in a browser for the live map.
 
 ### Installing as an iPhone app (PWA)
 

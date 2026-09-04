@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-09-04
+- Merged the landing page into the map page — `iss.html` is now `index.html` and serves as the home page; the separate landing page was removed. Matches the same change made in `adsb-portal`. Other pages now link back with `<a href="/">` instead of `/iss.html`.
+- Removed remaining Dutch text and "Bakkel" branding from `static/manifest.json` (PWA name/description), missed in the earlier translation pass.
 - Made the repository public on GitHub.
 - Rewrote git history to permanently remove `CLAUDE.md` from all past commits (it had only been untracked going forward, not purged from history) — required before making the repo public, since it contained a real Pi IP address, SSH port and hostname. History was force-pushed; commit hashes changed as a result.
 - Added a footer link to the GitHub repo on all pages.

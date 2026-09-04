@@ -1,7 +1,7 @@
 {
-  "name": "Space Tracker — Bakkel",
+  "name": "Space Tracker",
   "short_name": "Space Tracker",
-  "description": "Live ISS/Tiangong ruimtestation tracker en NASA open data",
+  "description": "Live ISS/Tiangong space station tracker and NASA open data",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
