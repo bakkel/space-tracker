@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-09-04
+- Fixed a bug where a NASA API rate-limit error (still valid JSON) was cached as if it were real data, so `/api/nasa/*` kept serving the error for the full cache TTL (up to 6 hours) instead of recovering once the rate limit reset. `_nasa_fetch()` now recognizes `{"error": ...}` responses, refuses to cache them, and falls back to the last known-good response instead.
 - Added an MIT `LICENSE`, now that the repository is public.
 - Merged the landing page into the map page — `iss.html` is now `index.html` and serves as the home page; the separate landing page was removed. Matches the same change made in `adsb-portal`. Other pages now link back with `<a href="/">` instead of `/iss.html`.
 - Removed remaining Dutch text and "Bakkel" branding from `static/manifest.json` (PWA name/description), missed in the earlier translation pass.

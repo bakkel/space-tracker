@@ -120,15 +120,15 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
             return data
     # 2. Disk (survives server restarts)
     cf = _nasa_cache_file(key)
+    disk_data = None
     if os.path.exists(cf):
         try:
             with open(cf, 'rb') as f:
                 saved = _json.loads(f.read())
-            ts = saved['ts']
-            if now - ts < ttl:
-                data = saved['d'].encode()
-                _nasa_cache[key] = (data, ts)
-                return data
+            disk_data = saved['d'].encode()
+            _nasa_cache[key] = (disk_data, saved['ts'])
+            if now - saved['ts'] < ttl:
+                return disk_data
         except Exception:
             pass
     # 3. Fetch API
@@ -139,19 +139,28 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
         )
         if result.returncode == 0 and result.stdout:
             try:
-                _json.loads(result.stdout)
-                _nasa_cache[key] = (result.stdout, now)
-                try:
-                    with open(cf, 'w') as f:
-                        _json.dump({'ts': now, 'd': result.stdout.decode('utf-8', errors='replace')}, f)
-                except Exception:
-                    pass
-                return result.stdout
+                parsed = _json.loads(result.stdout)
             except ValueError:
                 print(f"[nasa] {key}: invalid JSON response")
+            else:
+                # A NASA API error (e.g. rate limit) is still valid JSON — don't
+                # cache it, or it keeps getting served for the full TTL.
+                if isinstance(parsed, dict) and "error" in parsed:
+                    print(f"[nasa] {key}: NASA API error — {parsed['error']}")
+                else:
+                    _nasa_cache[key] = (result.stdout, now)
+                    try:
+                        with open(cf, 'w') as f:
+                            _json.dump({'ts': now, 'd': result.stdout.decode('utf-8', errors='replace')}, f)
+                    except Exception:
+                        pass
+                    return result.stdout
     except Exception as e:
         print(f"[nasa] fetch {key}: {e}")
-    return _nasa_cache.get(key, (None, 0))[0]
+    # Fall back to the last known-good response (memory or disk) rather than nothing
+    if key in _nasa_cache:
+        return _nasa_cache[key][0]
+    return disk_data
 
 
 def _mars_fetch():
@@ -170,8 +179,6 @@ def _mars_fetch():
             continue
         try:
             d = _j.loads(raw)
-            if d.get("error"):
-                return raw   # propagate NASA error (rate limit etc.) to client
             if d.get("photos"):
                 return raw
         except Exception:
