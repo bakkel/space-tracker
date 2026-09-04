@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-09-04
+- Made the repository public on GitHub.
+- Rewrote git history to permanently remove `CLAUDE.md` from all past commits (it had only been untracked going forward, not purged from history) — required before making the repo public, since it contained a real Pi IP address, SSH port and hostname. History was force-pushed; commit hashes changed as a result.
 - Added a footer link to the GitHub repo on all pages.
 - Added an alternative Docker deployment: `Dockerfile` + `docker-compose.yml` plus a `.dockerignore` that excludes the private infra notes. `server.py` now reads `PORT` from an environment variable (falling back to the existing default `8082`), so the same script runs unchanged on bare metal or in a container. This does not replace the existing systemd/rsync deployment — it's offered as an option for self-hosters who prefer Docker.
 - Translated the entire project (UI, README, changelog) to English and removed personal branding ("Bakkel's Space Tracker" → "Space Tracker"), in preparation for making the repository public on GitHub.
