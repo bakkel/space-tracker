@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sync dit project naar de Pi via SSH en herstart de service.
+# Sync this project to the Pi over SSH and restart the service.
 set -euo pipefail
 
 REMOTE=flight2
@@ -14,7 +14,8 @@ rsync -avz --delete \
   --exclude='__pycache__/' \
   --exclude='*.pyc' \
   --exclude='nasa_cache/' \
+  --exclude='CLAUDE.md' \
   ./ "$REMOTE:$REMOTE_DIR/"
 
 ssh "$REMOTE" "sudo systemctl restart $SERVICE"
-echo "Gedeployed naar $REMOTE:$REMOTE_DIR, service $SERVICE herstart."
+echo "Deployed to $REMOTE:$REMOTE_DIR, service $SERVICE restarted."

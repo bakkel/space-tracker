@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Artemis — Bakkel's Space Tracker</title>
+<title>Artemis — Space Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -47,14 +47,14 @@ main::after { content: ''; display: table; clear: both; }
 .sec:last-child { margin-bottom: 0; }
 .page-logo { position: fixed; left: max(16px, calc(50% - 696px)); top: 80px; width: 220px; height: auto; border-radius: 8px; z-index: 5; }
 
-/* ── Sectie cards ── */
+/* ── Section cards ── */
 .sec { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .sec-head { padding: 14px 22px; border-bottom: 1px solid var(--border); background: var(--bg3); display: flex; align-items: baseline; gap: 10px; }
 .sec-head h2 { font-size: 15px; font-weight: 600; }
 .sec-head .sub { font-size: 11px; color: var(--muted); }
 .sec-body { padding: 20px 22px; }
 
-/* ── Tijdlijn ── */
+/* ── Timeline ── */
 .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .mission-card {
   background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
@@ -138,49 +138,49 @@ main::after { content: ''; display: table; clear: both; }
 <main>
 <img class="page-logo" src="/artemis.png" alt="Artemis">
 
-  <!-- TIJDLIJN -->
+  <!-- TIMELINE -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#128640; Missie-overzicht</h2>
-      <span class="sub">NASA Artemis programma — terug naar de maan</span>
+      <h2>&#128640; Mission overview</h2>
+      <span class="sub">NASA Artemis program — back to the Moon</span>
     </div>
     <div class="sec-body">
       <div class="timeline">
 
         <div class="mission-card done">
           <div class="mission-stripe stripe-done"></div>
-          <div class="mission-sub">Missie I</div>
+          <div class="mission-sub">Mission I</div>
           <div class="mission-name">Artemis I</div>
-          <div class="mission-date">16 nov – 11 dec 2022</div>
-          <div class="mission-desc">Onbemande testvlucht van SLS en Orion. Capsule vloog 450.000 km van de aarde en passeerde de maan op 130 km afstand. Splashdown 11 december 2022.</div>
-          <span class="status-badge badge-done">&#10003; Voltooid</span>
+          <div class="mission-date">Nov 16 – Dec 11, 2022</div>
+          <div class="mission-desc">Uncrewed test flight of SLS and Orion. The capsule flew 450,000 km from Earth and passed the Moon at a distance of 130 km. Splashdown on December 11, 2022.</div>
+          <span class="status-badge badge-done">&#10003; Completed</span>
         </div>
 
         <div class="mission-card done">
           <div class="mission-stripe stripe-done"></div>
-          <div class="mission-sub">Missie II</div>
+          <div class="mission-sub">Mission II</div>
           <div class="mission-name">Artemis II</div>
           <div class="mission-date">April 2026</div>
-          <div class="mission-desc">Eerste bemande vlucht — vier astronauten (Reid Wiseman, Victor Glover, Christina Koch, Jeremy Hansen). Vrije-retourvlucht rond de maan zonder landing.</div>
-          <span class="status-badge badge-done">&#10003; Voltooid</span>
+          <div class="mission-desc">First crewed flight — four astronauts (Reid Wiseman, Victor Glover, Christina Koch, Jeremy Hansen). Free-return trajectory around the Moon without landing.</div>
+          <span class="status-badge badge-done">&#10003; Completed</span>
         </div>
 
         <div class="mission-card active">
           <div class="mission-stripe stripe-active"></div>
-          <div class="mission-sub">Missie III</div>
+          <div class="mission-sub">Mission III</div>
           <div class="mission-name">Artemis III</div>
-          <div class="mission-date">Gepland ~2027</div>
-          <div class="mission-desc">Eerste bemande maanlanding sinds Apollo 17 (1972). Astronauten landen met SpaceX Starship HLS op de Zuidpool van de maan. SLS-hardware arriveert nu bij Kennedy.</div>
-          <span class="status-badge badge-active">&#9679; In voorbereiding</span>
+          <div class="mission-date">Planned ~2027</div>
+          <div class="mission-desc">First crewed Moon landing since Apollo 17 (1972). Astronauts will land using the SpaceX Starship HLS at the Moon's South Pole. SLS hardware is now arriving at Kennedy.</div>
+          <span class="status-badge badge-active">&#9679; In preparation</span>
         </div>
 
         <div class="mission-card future">
           <div class="mission-stripe stripe-future"></div>
-          <div class="mission-sub">Missie IV</div>
+          <div class="mission-sub">Mission IV</div>
           <div class="mission-name">Artemis IV</div>
-          <div class="mission-date">Gepland ~2028+</div>
-          <div class="mission-desc">Eerste missie met de Lunar Gateway — een ruimtestation in een baan om de maan. Langere verblijfsduur op het maanoppervlak en uitbreiding van de Gateway-modules.</div>
-          <span class="status-badge badge-future">&#9711; Gepland</span>
+          <div class="mission-date">Planned ~2028+</div>
+          <div class="mission-desc">First mission with the Lunar Gateway — a space station orbiting the Moon. Longer stays on the lunar surface and expansion of the Gateway modules.</div>
+          <span class="status-badge badge-future">&#9711; Planned</span>
         </div>
 
       </div>
@@ -191,23 +191,27 @@ main::after { content: ''; display: table; clear: both; }
   <div class="sec">
     <div class="sec-head">
       <h2>&#128240; NASA Artemis Blog</h2>
-      <span class="sub">Laatste updates van nasa.gov</span>
+      <span class="sub">Latest updates from nasa.gov</span>
       <a href="https://www.nasa.gov/blogs/artemis/" target="_blank" rel="noopener"
          style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">
-        Alle berichten ↗
+        All posts ↗
       </a>
     </div>
     <div class="sec-body" id="feed-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
+
+  <footer style="text-align:center;padding:24px 0 8px;color:var(--muted);font-size:11px">
+    <a href="https://github.com/bakkel/space-tracker" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none">GitHub ↗</a>
+  </footer>
 
 </main>
 
 <script>
 function updateClock() {
   document.getElementById('update-time').textContent =
-    new Date().toLocaleTimeString('nl', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -215,7 +219,7 @@ setInterval(updateClock, 1000);
 function formatDate(rssDate) {
   try {
     const d = new Date(rssDate);
-    return d.toLocaleDateString('nl', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   } catch { return rssDate; }
 }
 
@@ -225,10 +229,10 @@ async function loadFeed() {
     const resp = await fetch('/api/artemis/feed');
     if (!resp.ok) throw new Error(`server ${resp.status}`);
     let data;
-    try { data = await resp.json(); } catch(_) { throw new Error('ongeldig antwoord'); }
+    try { data = await resp.json(); } catch(_) { throw new Error('invalid response'); }
 
     const items = data.items || [];
-    if (!items.length) { el.innerHTML = '<div class="loading">Geen berichten beschikbaar.</div>'; return; }
+    if (!items.length) { el.innerHTML = '<div class="loading">No posts available.</div>'; return; }
 
     el.innerHTML = `<div class="feed-grid">${items.map(item => {
       const img = item.image
@@ -247,7 +251,7 @@ async function loadFeed() {
       </a>`;
     }).join('')}</div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 

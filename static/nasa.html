@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NASA Open Data — Bakkel's Space Tracker</title>
+<title>NASA Open Data — Space Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -46,7 +46,7 @@ main::after { content: ''; display: table; clear: both; }
 .sec:last-child { margin-bottom: 0; }
 .page-logo { position: fixed; left: max(16px, calc(50% - 696px)); top: 80px; width: 220px; height: auto; border-radius: 50%; z-index: 5; }
 
-/* ── Sectie cards ── */
+/* ── Section cards ── */
 .sec {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -99,7 +99,7 @@ main::after { content: ''; display: table; clear: both; }
 .eonet-meta  { font-size: 11px; color: var(--muted); }
 .cat-badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; margin-right: 4px; border: 1px solid var(--border); color: var(--muted); background: var(--bg); }
 
-/* ── Ruimteweer ── */
+/* ── Space weather ── */
 .sw-grid { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; }
 .sw-status-badge { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 6px; white-space: nowrap; }
 .sw-quiet  { background: #3fb95018; color: var(--green);  border: 1px solid #3fb95044; }
@@ -136,97 +136,101 @@ main::after { content: ''; display: table; clear: both; }
   <h1><img src="/nasa.png" style="height:22px;width:auto;vertical-align:middle;margin-right:6px;border-radius:50%"> NASA <span>Open Data</span></h1>
   <a href="/iss.html">&#8592; Space Tracker</a>
   <a href="/">&#127760; Home</a>
-  <div id="update-time">laden…</div>
+  <div id="update-time">loading…</div>
   <a href="/artemis.html" style="display:inline-flex;align-items:center;gap:5px"><img src="/artemis.png" style="height:14px;width:auto;border-radius:2px"> Artemis</a>
-  <a href="/ruimteweer.html">&#9728; Ruimteweer</a>
+  <a href="/ruimteweer.html">&#9728; Space Weather</a>
 </header>
 
 <main>
 <img class="page-logo" src="/nasa.png" alt="NASA">
 
-  <!-- RUIMTEWEER -->
+  <!-- SPACE WEATHER -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#9728; Ruimteweer</h2>
-      <span class="sub">NASA DONKI — Space Weather Notifications (7 dagen)</span>
-      <a href="/ruimteweer.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">meer info ›</a>
+      <h2>&#9728; Space Weather</h2>
+      <span class="sub">NASA DONKI — Space Weather Notifications (7 days)</span>
+      <a href="/ruimteweer.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">more info ›</a>
     </div>
     <div class="sec-body" id="donki-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
 
   <!-- APOD -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#128247; Astronomische Foto van de Dag</h2>
+      <h2>&#128247; Astronomy Picture of the Day</h2>
       <span class="sub">NASA APOD</span>
     </div>
     <div class="sec-body" id="apod-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
 
   <!-- EPIC -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#127758; Aardfoto vanuit de ruimte</h2>
-      <span class="sub">NASA EPIC — DSCOVR-satelliet op 1,5 miljoen km afstand</span>
+      <h2>&#127758; Earth photo from space</h2>
+      <span class="sub">NASA EPIC — DSCOVR satellite, 1.5 million km away</span>
     </div>
     <div class="sec-body" id="epic-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
 
   <!-- MARS -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#128308; Mars Rover — Laatste Beelden</h2>
-      <span class="sub">NASA Perseverance — meest recente sol</span>
+      <h2>&#128308; Mars Rover — Latest Images</h2>
+      <span class="sub">NASA Perseverance — most recent sol</span>
     </div>
     <div class="sec-body" id="mars-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
 
   <!-- NEO WEEK -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#9762; Asteroïden komende 7 dagen</h2>
+      <h2>&#9762; Asteroids in the next 7 days</h2>
       <span class="sub">NASA Near Earth Objects</span>
     </div>
     <div class="sec-body" id="neo-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
 
   <!-- EONET -->
   <div class="sec">
     <div class="sec-head">
-      <h2>&#127757; Actieve Aardgebeurtenissen</h2>
+      <h2>&#127757; Active Earth Events</h2>
       <span class="sub">NASA EONET — Earth Observatory Natural Event Tracker</span>
     </div>
     <div class="sec-body" id="eonet-body">
-      <div class="loading">Laden…</div>
+      <div class="loading">Loading…</div>
     </div>
   </div>
+
+  <footer style="text-align:center;padding:24px 0 8px;color:var(--muted);font-size:11px">
+    <a href="https://github.com/bakkel/space-tracker" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none">GitHub ↗</a>
+  </footer>
 
 </main>
 
 <script>
-// ── TIJD ──────────────────────────────────────────────────────────────────────
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
 function updateClock() {
   document.getElementById('update-time').textContent =
-    new Date().toLocaleTimeString('nl', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 updateClock();
 setInterval(updateClock, 1000);
 
 // ── DONKI ────────────────────────────────────────────────────────────────────
 const DONKI_TYPES = {
-  CME: 'Coronale massa-uitstoot', FLR: 'Zonnevlam', GST: 'Geomagnetische storm',
-  IPS: 'Interplanetaire schok',   SEP: 'Energetische deeltjes',
-  MPC: 'Magnetopauze-oversteek',  RBE: 'Stralingsgordelversterking',
+  CME: 'Coronal Mass Ejection', FLR: 'Solar Flare', GST: 'Geomagnetic Storm',
+  IPS: 'Interplanetary Shock',  SEP: 'Solar Energetic Particles',
+  MPC: 'Magnetopause Crossing', RBE: 'Radiation Belt Enhancement',
 };
 const DONKI_ANCHORS = { CME: 'sw-cme', FLR: 'sw-flr', GST: 'sw-gst', IPS: 'sw-ips', SEP: 'sw-sep', MPC: 'sw-mpc', RBE: 'sw-rbe' };
 
@@ -234,7 +238,7 @@ async function loadDonki() {
   const el = document.getElementById('donki-body');
   try {
     const events = await fetch('/api/nasa/donki').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
-    if (!Array.isArray(events) || !events.length) { el.innerHTML = '<div class="loading">Geen meldingen beschikbaar.</div>'; return; }
+    if (!Array.isArray(events) || !events.length) { el.innerHTML = '<div class="loading">No notifications available.</div>'; return; }
 
     const now = Date.now();
     const h24 = now - 86400000;
@@ -247,9 +251,9 @@ async function loadDonki() {
     }
 
     let cls, label;
-    if (recent.some(e => e.messageType === 'GST'))              { cls = 'sw-storm';  label = '&#9940; Geomagnetische storm actief'; }
-    else if (recent.some(e => ['CME','FLR'].includes(e.messageType))) { cls = 'sw-active'; label = '&#9888; Verhoogde activiteit'; }
-    else                                                          { cls = 'sw-quiet';  label = '&#10003; Rustig'; }
+    if (recent.some(e => e.messageType === 'GST'))              { cls = 'sw-storm';  label = '&#9940; Geomagnetic storm active'; }
+    else if (recent.some(e => ['CME','FLR'].includes(e.messageType))) { cls = 'sw-active'; label = '&#9888; Increased activity'; }
+    else                                                          { cls = 'sw-quiet';  label = '&#10003; Quiet'; }
 
     const tags = Object.entries(counts).map(([t, n]) => {
       const href = DONKI_ANCHORS[t] ? `/ruimteweer.html#${DONKI_ANCHORS[t]}` : '/ruimteweer.html';
@@ -258,8 +262,8 @@ async function loadDonki() {
 
     const rows = [...events].slice(-8).reverse().map(e => {
       const d  = new Date((e.messageIssueTime||'').endsWith('Z') ? e.messageIssueTime : e.messageIssueTime+'Z');
-      const ds = d.toLocaleDateString('nl', { month:'short', day:'numeric', timeZone:'UTC' });
-      const ts = d.toLocaleTimeString('nl', { hour:'2-digit', minute:'2-digit', timeZone:'UTC' }) + ' UTC';
+      const ds = d.toLocaleDateString('en-GB', { month:'short', day:'numeric', timeZone:'UTC' });
+      const ts = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', timeZone:'UTC' }) + ' UTC';
       const href = DONKI_ANCHORS[e.messageType] ? `/ruimteweer.html#${DONKI_ANCHORS[e.messageType]}` : '/ruimteweer.html';
       return `<div class="sw-row">
         <a href="${href}" target="_blank" style="color:var(--text);text-decoration:none">${DONKI_TYPES[e.messageType]||e.messageType}</a>
@@ -276,7 +280,7 @@ async function loadDonki() {
         </div>
       </div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 
@@ -285,7 +289,7 @@ async function loadApod() {
   const el = document.getElementById('apod-body');
   try {
     const d = await fetch('/api/nasa/apod').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
-    if (!d || !d.title) throw new Error('geen data');
+    if (!d || !d.title) throw new Error('no data');
 
     const media = d.media_type === 'image'
       ? `<a href="${d.hdurl || d.url}" target="_blank"><img id="apod-img" src="${d.url}" alt="${d.title}"></a>`
@@ -301,7 +305,7 @@ async function loadApod() {
       <div id="apod-date">${d.date}${d.copyright ? ' — © ' + d.copyright : ''}</div>
       <div id="apod-text">${excerpt}</div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 
@@ -310,7 +314,7 @@ async function loadEpic() {
   const el = document.getElementById('epic-body');
   try {
     const data = await fetch('/api/nasa/epic').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
-    if (!data || !data.length) throw new Error('geen data');
+    if (!data || !data.length) throw new Error('no data');
 
     const item = data[0];
     const [datePart] = item.date.split(' ');
@@ -326,15 +330,15 @@ async function loadEpic() {
           <img id="epic-img" src="${thumbUrl}" alt="Earth from EPIC" loading="lazy">
         </a>
         <div class="epic-info">
-          <h3>Aarde — ${datePart}</h3>
-          <p>Opgenomen door de EPIC-camera aan boord van de DSCOVR-satelliet op het Lagrangepunt L1, op circa 1,5 miljoen km van de aarde.</p>
-          <p><b>Beeldcentrum:</b> ${lat}° lat / ${lon}° lon</p>
+          <h3>Earth — ${datePart}</h3>
+          <p>Captured by the EPIC camera aboard the DSCOVR satellite at Lagrange point L1, about 1.5 million km from Earth.</p>
+          <p><b>Image center:</b> ${lat}° lat / ${lon}° lon</p>
           <p style="font-size:12px">${item.caption || ''}</p>
-          <p style="margin-top:10px"><a href="${fullUrl}" target="_blank" style="color:var(--accent);font-size:12px">Volledige resolutie ↗</a></p>
+          <p style="margin-top:10px"><a href="${fullUrl}" target="_blank" style="color:var(--accent);font-size:12px">Full resolution ↗</a></p>
         </div>
       </div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 
@@ -345,12 +349,12 @@ async function loadMars() {
     const resp = await fetch('/api/nasa/mars');
     if (!resp.ok) throw new Error(`server ${resp.status}`);
     let data;
-    try { data = await resp.json(); } catch(_) { throw new Error('ongeldig antwoord'); }
+    try { data = await resp.json(); } catch(_) { throw new Error('invalid response'); }
 
-    if (data.error) throw new Error(data.error.message || data.error.code || 'NASA fout');
+    if (data.error) throw new Error(data.error.message || data.error.code || 'NASA error');
     const photos = data.photos || [];
     if (!photos.length) {
-      el.innerHTML = '<div class="loading" style="color:var(--muted)">Geen recente foto\'s beschikbaar.</div>';
+      el.innerHTML = '<div class="loading" style="color:var(--muted)">No recent photos available.</div>';
       return;
     }
 
@@ -361,7 +365,7 @@ async function loadMars() {
       const cam = p.camera?.full_name || p.camera?.name || '–';
       return `<div class="mars-card">
         <a href="${src}" target="_blank" rel="noopener">
-          <img src="${src}" alt="Mars foto" loading="lazy">
+          <img src="${src}" alt="Mars photo" loading="lazy">
         </a>
         <div class="mars-meta">
           <strong>${cam}</strong>
@@ -376,7 +380,7 @@ async function loadMars() {
       </p>
       <div class="mars-grid">${cards}</div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 
@@ -402,23 +406,23 @@ async function loadNeoWeek() {
       const name  = a.name.replace(/^\(|\)$/g, '');
       return `<tr>
         <td>${a._date}</td>
-        <td style="color:${haz ? 'var(--red)' : 'var(--text)'}">${name}${haz ? ' <span class="haz-badge">⚠ Gevaarlijk</span>' : ''}</td>
+        <td style="color:${haz ? 'var(--red)' : 'var(--text)'}">${name}${haz ? ' <span class="haz-badge">⚠ Hazardous</span>' : ''}</td>
         <td>${dist}M km</td>
         <td style="color:var(--muted)">${size}</td>
-        <td style="color:var(--muted)">${Math.round(parseFloat(ca.relative_velocity.kilometers_per_hour)).toLocaleString('nl')} km/u</td>
+        <td style="color:var(--muted)">${Math.round(parseFloat(ca.relative_velocity.kilometers_per_hour)).toLocaleString('en-GB')} km/h</td>
       </tr>`;
     }).join('');
 
     el.innerHTML = `
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${asteroids.length} objecten gevonden — gesorteerd op dichtstbijzijnde passage</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${asteroids.length} objects found — sorted by closest approach</p>
       <table class="neo-table">
         <thead><tr>
-          <th>Datum</th><th>Naam</th><th>Afstand</th><th>Grootte</th><th>Snelheid</th>
+          <th>Date</th><th>Name</th><th>Distance</th><th>Size</th><th>Speed</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 
@@ -444,10 +448,10 @@ async function loadEonet() {
   try {
     const data   = await fetch('/api/nasa/eonet').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
     const events = data.events || [];
-    if (!events.length) { el.innerHTML = '<div class="loading">Geen actieve gebeurtenissen</div>'; return; }
+    if (!events.length) { el.innerHTML = '<div class="loading">No active events</div>'; return; }
 
     el.innerHTML = `
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${events.length} actieve gebeurtenissen</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${events.length} active events</p>
       <div class="eonet-list">
         ${events.map(ev => {
           const cat    = ev.categories?.[0];
@@ -455,7 +459,7 @@ async function loadEonet() {
           const latest = ev.geometry?.slice(-1)[0];
           const date   = latest?.date ? latest.date.slice(0, 10) : '–';
           const src    = ev.sources?.[0];
-          const link   = src ? `<a href="${src.url}" target="_blank" style="color:var(--accent);font-size:11px">bron ↗</a>` : '';
+          const link   = src ? `<a href="${src.url}" target="_blank" style="color:var(--accent);font-size:11px">source ↗</a>` : '';
           const badge  = cat ? `<span class="cat-badge">${cat.title}</span>` : '';
           return `<div class="eonet-item">
             <div class="eonet-icon">${icon}</div>
@@ -467,7 +471,7 @@ async function loadEonet() {
         }).join('')}
       </div>`;
   } catch(e) {
-    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+    el.innerHTML = `<div class="error">Unavailable (${e.message})</div>`;
   }
 }
 

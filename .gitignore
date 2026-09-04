@@ -3,3 +3,6 @@
 nasa_cache/
 __pycache__/
 *.pyc
+
+# Persoonlijke infra-notities, niet publiek
+CLAUDE.md

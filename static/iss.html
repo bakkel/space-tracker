@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bakkel's Space Tracker</title>
+<title>Space Tracker</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -96,7 +96,7 @@ header a:hover { color: var(--text); border-color: var(--muted); }
 .crew-item:last-child { border-bottom: none; }
 .crew-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
-/* ── NASA SECTIE ONDER DE KAART ── */
+/* ── NASA SECTION BELOW THE MAP ── */
 #nasa-link {
   border-top: 1px solid var(--border);
   padding: 18px 24px;
@@ -107,7 +107,11 @@ header a:hover { color: var(--text); border-color: var(--muted); }
 #nasa-link a { font-size: 13px; color: var(--accent); text-decoration: none; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; }
 #nasa-link a:hover { border-color: var(--accent); }
 
-/* ── Kaartlegenda ── */
+footer#page-footer { text-align: center; padding: 12px 0; color: var(--muted); font-size: 11px; background: var(--bg2); border-top: 1px solid var(--border); }
+footer#page-footer a { color: var(--muted); text-decoration: none; }
+footer#page-footer a:hover { color: var(--text); }
+
+/* ── Map legend ── */
 #map { position: relative; }
 #map-legend {
   position: absolute; bottom: 24px; left: 10px; z-index: 1000;
@@ -138,29 +142,29 @@ header a:hover { color: var(--text); border-color: var(--muted); }
 <body>
 
 <header>
-  <h1>&#128302; Bakkel's <span>Space Tracker</span></h1>
+  <h1>&#128302; <span>Space Tracker</span></h1>
   <a href="/">&#8592; Home</a>
-  <div id="update-time"><span id="feed-dot"></span>wachten…</div>
+  <div id="update-time"><span id="feed-dot"></span>waiting…</div>
   <a href="/nasa.html" style="color:var(--muted);text-decoration:none;font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px"><img src="/nasa.png" style="height:14px;width:auto;border-radius:50%"> NASA data</a>
   <a href="/artemis.html" style="color:var(--muted);text-decoration:none;font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px"><img src="/artemis.png" style="height:14px;width:auto;border-radius:2px"> Artemis</a>
 </header>
 
 <div id="app">
 
-  <!-- ── Kaart + zijpaneel ── -->
+  <!-- ── Map + side panel ── -->
   <div id="top">
     <div id="map">
     <div id="map-legend">
       <span class="legend-iss">&#9644; ISS</span>
       <span class="legend-tg">&#9644; Tiangong</span>
-      <button id="tz-btn" onclick="toggleTzLayer()" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:1px 7px;font-size:10px;cursor:pointer;line-height:1.6" title="UTC tijdzones aan/uit">Tijdzones</button>
+      <button id="tz-btn" onclick="toggleTzLayer()" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:1px 7px;font-size:10px;cursor:pointer;line-height:1.6" title="Toggle UTC time zones">Time zones</button>
     </div>
   </div>
     <div id="panel">
 
       <div class="section">
         <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span>Positie &amp; Status</span>
+          <span>Position &amp; Status</span>
           <div style="display:flex;gap:4px">
             <button class="tab-btn active" id="tab-iss" onclick="switchTab('iss')">&#11088; ISS</button>
             <button class="tab-btn" id="tab-tg" onclick="switchTab('tg')">&#128308; Tiangong</button>
@@ -169,52 +173,52 @@ header a:hover { color: var(--text); border-color: var(--muted); }
 
         <div id="panel-iss" class="cards">
           <div class="card full accent">
-            <div class="label">Positie (lat / lon)</div>
+            <div class="label">Position (lat / lon)</div>
             <div class="value" id="p-latlon">–</div>
           </div>
           <div class="card gold">
-            <div class="label">Hoogte</div>
+            <div class="label">Altitude</div>
             <div class="value" id="p-alt">–</div>
             <div class="unit">km</div>
           </div>
           <div class="card green">
-            <div class="label">Snelheid</div>
+            <div class="label">Speed</div>
             <div class="value" id="p-vel">–</div>
-            <div class="unit">km/u</div>
+            <div class="unit">km/h</div>
           </div>
           <div class="card full">
-            <div class="label">Zichtbaar gebied (diameter)</div>
+            <div class="label">Visible area (diameter)</div>
             <div class="value" id="p-foot" style="font-size:16px;color:var(--muted)">–</div>
-            <div class="unit">km op aardoppervlak</div>
+            <div class="unit">km on Earth's surface</div>
           </div>
         </div>
 
         <div id="panel-tg" class="cards" style="display:none">
           <div class="card full accent">
-            <div class="label">Positie (lat / lon)</div>
+            <div class="label">Position (lat / lon)</div>
             <div class="value" id="tg-latlon">–</div>
           </div>
           <div class="card gold">
-            <div class="label">Hoogte</div>
+            <div class="label">Altitude</div>
             <div class="value" id="tg-alt">–</div>
             <div class="unit">km</div>
           </div>
           <div class="card green">
-            <div class="label">Snelheid</div>
+            <div class="label">Speed</div>
             <div class="value" id="tg-vel">–</div>
-            <div class="unit">km/u</div>
+            <div class="unit">km/h</div>
           </div>
           <div class="card full">
-            <div class="label">Zichtbaar gebied (diameter)</div>
+            <div class="label">Visible area (diameter)</div>
             <div class="value" id="tg-foot" style="font-size:16px;color:var(--muted)">–</div>
-            <div class="unit">km op aardoppervlak</div>
+            <div class="unit">km on Earth's surface</div>
           </div>
         </div>
       </div>
 
       <div class="section" style="border-bottom:none">
-        <div class="section-title">Mensen in de ruimte (<span id="crew-count">–</span>)</div>
-        <div id="crew-list"><div style="color:var(--muted);font-size:12px">Laden…</div></div>
+        <div class="section-title">People in space (<span id="crew-count">–</span>)</div>
+        <div id="crew-list"><div style="color:var(--muted);font-size:12px">Loading…</div></div>
       </div>
 
     </div>
@@ -222,16 +226,20 @@ header a:hover { color: var(--text); border-color: var(--muted); }
 
   <!-- ── NASA data link ── -->
   <div id="nasa-link">
-    <span>&#127758; APOD, EPIC, Mars Rover, Asteroïden en Aardgebeurtenissen op de NASA pagina</span>
+    <span>&#127758; APOD, EPIC, Mars Rover, asteroids and Earth events on the NASA page</span>
     <a href="/nasa.html" style="display:inline-flex;align-items:center;gap:6px"><img src="/nasa.png" style="height:16px;width:auto;border-radius:50%"> NASA Open Data ›</a>
   </div>
+
+  <footer id="page-footer">
+    <a href="https://github.com/bakkel/space-tracker" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </footer>
 
 </div>
 
 <script>
 const POLL_ISS_MS   = 5000;
 const POLL_ASTRO_MS = 60000;
-const TRAIL_MAX     = 120;   // 120 × 5 s = 10 minuten
+const TRAIL_MAX     = 120;   // 120 × 5 s = 10 minutes
 
 // ── MAP ──────────────────────────────────────────────────────────────────────
 const map = L.map('map', { zoomControl: true, worldCopyJump: true }).setView([20, 0], 2);
@@ -254,7 +262,7 @@ try {
   }).addTo(map);
   setInterval(() => terminator.setTime(new Date()), 60000);
 } catch(e) {
-  console.warn('Terminator niet beschikbaar:', e);
+  console.warn('Terminator unavailable:', e);
 }
 
 function issIcon() {
@@ -281,7 +289,7 @@ function issIcon() {
 }
 
 function tiangongIcon() {
-  // Tiangong heeft 2 paar zonnepanelen + core + 2 laboratoriummodules (kleiner dan ISS)
+  // Tiangong has 2 pairs of solar panels + core + 2 lab modules (smaller than ISS)
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 18" width="40" height="18">
     <rect x="0"  y="7"  width="40" height="4" fill="#d0d0d0"/>
     <rect x="0"  y="1"  width="10" height="5" fill="#cc2233" rx=".5"/>
@@ -365,12 +373,12 @@ function popupHTML(d) {
   return `
     <div style="margin-bottom:4px"><b style="color:#ffd700;font-size:14px">&#128302; ISS</b></div>
     <table style="border-spacing:0 3px;font-size:12px">
-      <tr><td style="color:var(--muted);padding-right:12px">Positie</td>
+      <tr><td style="color:var(--muted);padding-right:12px">Position</td>
           <td style="font-family:monospace">${fmt(d.latitude, 4)}° / ${fmt(d.longitude, 4)}°</td></tr>
-      <tr><td style="color:var(--muted);padding-right:12px">Hoogte</td>
-          <td>${Math.round(d.altitude).toLocaleString('nl')} km</td></tr>
-      <tr><td style="color:var(--muted);padding-right:12px">Snelheid</td>
-          <td>${Math.round(d.velocity).toLocaleString('nl')} km/u</td></tr>
+      <tr><td style="color:var(--muted);padding-right:12px">Altitude</td>
+          <td>${Math.round(d.altitude).toLocaleString('en-GB')} km</td></tr>
+      <tr><td style="color:var(--muted);padding-right:12px">Speed</td>
+          <td>${Math.round(d.velocity).toLocaleString('en-GB')} km/h</td></tr>
     </table>`;
 }
 
@@ -412,18 +420,18 @@ function updateTiangong(d) {
 function tiangongPopupHTML(d) {
   return `
     <div style="margin-bottom:4px"><b style="color:#cc2233;font-size:14px">&#128302; Tiangong</b>
-      <span style="font-size:10px;color:var(--muted);margin-left:6px">Chinese ruimtestation</span></div>
+      <span style="font-size:10px;color:var(--muted);margin-left:6px">Chinese space station</span></div>
     <table style="border-spacing:0 3px;font-size:12px">
-      <tr><td style="color:var(--muted);padding-right:12px">Positie</td>
+      <tr><td style="color:var(--muted);padding-right:12px">Position</td>
           <td style="font-family:monospace">${fmt(d.latitude, 4)}° / ${fmt(d.longitude, 4)}°</td></tr>
-      <tr><td style="color:var(--muted);padding-right:12px">Hoogte</td>
-          <td>${Math.round(d.altitude).toLocaleString('nl')} km</td></tr>
-      <tr><td style="color:var(--muted);padding-right:12px">Snelheid</td>
-          <td>${Math.round(d.velocity).toLocaleString('nl')} km/u</td></tr>
+      <tr><td style="color:var(--muted);padding-right:12px">Altitude</td>
+          <td>${Math.round(d.altitude).toLocaleString('en-GB')} km</td></tr>
+      <tr><td style="color:var(--muted);padding-right:12px">Speed</td>
+          <td>${Math.round(d.velocity).toLocaleString('en-GB')} km/h</td></tr>
     </table>`;
 }
 
-// ── TIJDZONE OVERLAY ─────────────────────────────────────────────────────────
+// ── TIME ZONE OVERLAY ─────────────────────────────────────────────────────────
 let _tzLayer   = null;
 let _tzVisible = false;
 
@@ -475,17 +483,17 @@ function fmt(n, dec = 0) {
 function updatePanel(d) {
   document.getElementById('p-latlon').textContent =
     `${fmt(d.latitude, 4)}° / ${fmt(d.longitude, 4)}°`;
-  document.getElementById('p-alt').textContent  = Math.round(d.altitude).toLocaleString('nl');
-  document.getElementById('p-vel').textContent  = Math.round(d.velocity).toLocaleString('nl');
-  document.getElementById('p-foot').textContent = Math.round(d.footprint).toLocaleString('nl');
+  document.getElementById('p-alt').textContent  = Math.round(d.altitude).toLocaleString('en-GB');
+  document.getElementById('p-vel').textContent  = Math.round(d.velocity).toLocaleString('en-GB');
+  document.getElementById('p-foot').textContent = Math.round(d.footprint).toLocaleString('en-GB');
 
 }
 
 function updateTiangongPanel(d) {
   document.getElementById('tg-latlon').textContent = `${fmt(d.latitude, 4)}° / ${fmt(d.longitude, 4)}°`;
-  document.getElementById('tg-alt').textContent    = Math.round(d.altitude).toLocaleString('nl');
-  document.getElementById('tg-vel').textContent    = Math.round(d.velocity).toLocaleString('nl');
-  document.getElementById('tg-foot').textContent   = Math.round(d.footprint).toLocaleString('nl');
+  document.getElementById('tg-alt').textContent    = Math.round(d.altitude).toLocaleString('en-GB');
+  document.getElementById('tg-vel').textContent    = Math.round(d.velocity).toLocaleString('en-GB');
+  document.getElementById('tg-foot').textContent   = Math.round(d.footprint).toLocaleString('en-GB');
 }
 
 // ── CREW ──────────────────────────────────────────────────────────────────────
@@ -493,7 +501,7 @@ function renderCrew(people) {
   document.getElementById('crew-count').textContent = people.length;
   const el = document.getElementById('crew-list');
   if (!people.length) {
-    el.innerHTML = '<div style="color:var(--muted);font-size:12px">Geen data</div>';
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px">No data</div>';
     return;
   }
   const byCraft = {};
@@ -529,10 +537,10 @@ async function pollISS() {
     updateMap(d);
     updatePanel(d);
     document.getElementById('update-time').innerHTML =
-      '<span id="feed-dot" class="ok"></span>' + new Date().toLocaleTimeString('nl');
+      '<span id="feed-dot" class="ok"></span>' + new Date().toLocaleTimeString('en-GB');
   } catch {
     document.getElementById('update-time').innerHTML =
-      '<span id="feed-dot" class="error"></span>Verbindingsfout';
+      '<span id="feed-dot" class="error"></span>Connection error';
   }
 }
 
@@ -554,7 +562,7 @@ async function pollAstros() {
     setTimeout(() => ctrl.abort(), 6000);
     const d = await fetch('/api/astros', { signal: ctrl.signal }).then(r => r.json());
     renderCrew(d.people);
-  } catch { /* stil falen */ }
+  } catch { /* fail silently */ }
 }
 
 pollISS();

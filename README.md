@@ -1,37 +1,37 @@
 # Space Tracker
 
-Een zelfgehoste webportal die de ISS en het Chinese ruimtestation Tiangong live op een wereldkaart volgt, met ruimteweer, bemanning en NASA open data. Draait als lichtgewicht Python service, geen frameworks, geen build stap.
+A self-hosted web portal that tracks the ISS and the Chinese Tiangong space station live on a world map, with space weather, crew and NASA open data. Runs as a lightweight Python service, no frameworks, no build step.
 
-## Functionaliteiten
+## Features
 
-- **Live kaart** (`iss.html`) — live ISS- en Tiangong-positie op een wereldkaart, via server-side SGP4-baanberekening
-- **NASA Open Data** (`nasa.html`) — APOD, ruimteweer-notificaties, near-earth objects, EPIC aardfoto's, Mars-roverfoto's
-- **Artemis** (`artemis.html`) — missietijdlijn + live NASA Artemis blog RSS-feed
-- **Ruimteweer** (`ruimteweer.html`) — uitleg ruimteweer-events/codes
-- **Astronauten in de ruimte** — wie er momenteel in een baan om de aarde zit
-- **PWA** — installeerbaar als home screen app op iPhone; full screen, dark statusbalk
-- **Mobielvriendelijk** — responsieve layout
+- **Live map** (`iss.html`) — live ISS and Tiangong position on a world map, via server-side SGP4 orbit calculation
+- **NASA Open Data** (`nasa.html`) — APOD, space weather notifications, near-earth objects, EPIC Earth photos, Mars rover photos
+- **Artemis** (`artemis.html`) — mission timeline + live NASA Artemis blog RSS feed
+- **Space Weather** (`ruimteweer.html`) — explanation of space weather events/codes
+- **People in space** — who's currently in orbit around Earth
+- **PWA** — installable as a home screen app on iPhone; full screen, dark status bar
+- **Mobile-friendly** — responsive layout
 
-## Architectuur
+## Architecture
 
 ```
-server.py   :8082  ← serveert de portal
-├── GET /api/iss           → live ISS-positie (server-side SGP4)
-├── GET /api/tiangong      → live Tiangong-positie (server-side SGP4)
-├── GET /api/astros        → astronauten momenteel in de ruimte
-└── GET /api/nasa/*        → NASA Open Data (APOD, DONKI, NEO, EPIC, Mars, EONET), gecached
-└── GET /api/artemis/feed  → NASA Artemis blog RSS-feed, gecached
+server.py   :8082  ← serves the portal
+├── GET /api/iss           → live ISS position (server-side SGP4)
+├── GET /api/tiangong      → live Tiangong position (server-side SGP4)
+├── GET /api/astros        → people currently in space
+└── GET /api/nasa/*        → NASA Open Data (APOD, DONKI, NEO, EPIC, Mars, EONET), cached
+└── GET /api/artemis/feed  → NASA Artemis blog RSS feed, cached
 ```
 
-TLE-data (baangegevens) wordt opgehaald en 6 uur gecached uit meerdere bronnen (ivanstanojevic.me, CelesTrak).
+TLE data (orbital elements) is fetched and cached for 6 hours from multiple sources (ivanstanojevic.me, CelesTrak).
 
-## Vereisten
+## Requirements
 
 - Python 3.7+
 - `sgp4` package: `pip3 install sgp4`
-- Optioneel: een [NASA API key](https://api.nasa.gov/) (`NASA_API_KEY` env var) — zonder key wordt de gedeelde `DEMO_KEY` gebruikt, met een lager rate limit
+- Optional: a [NASA API key](https://api.nasa.gov/) (`NASA_API_KEY` env var) — without a key the shared `DEMO_KEY` is used, with a lower rate limit
 
-## Installatie
+## Installation
 
 ```bash
 git clone <repo-url> space-tracker
@@ -47,51 +47,65 @@ sudo systemctl enable space-tracker
 sudo systemctl start space-tracker
 ```
 
+Edit the `User` and `WorkingDirectory` in `space-tracker.service` to match your own system user and install path first.
+
 ### Deployment
 
-`deploy.sh` synct dit project via `rsync` over SSH naar de Pi en herstart de service:
+`deploy.sh` syncs this project to the Pi via `rsync` over SSH and restarts the service:
 
 ```bash
 ./deploy.sh
 ```
 
-Pas `REMOTE`, `REMOTE_DIR` en `SERVICE` bovenaan het script aan naar je eigen situatie.
+Adjust `REMOTE`, `REMOTE_DIR` and `SERVICE` at the top of the script to match your own setup.
 
-## Configuratie
+### Docker (alternative)
 
-Bovenaan `server.py`:
+Instead of the systemd service, you can run the portal in a container:
 
-| Variabele | Standaard | Beschrijving |
+```bash
+docker compose up -d --build
+```
+
+The NASA API response cache is persisted to `./nasa_cache` via a bind mount, so cached data survives container restarts.
+
+## Configuration
+
+At the top of `server.py` (or as environment variables, e.g. in `docker-compose.yml`):
+
+| Variable | Default | Description |
 |---|---|---|
-| `PORT` | `8082` | Poort waarop de portal luistert |
+| `PORT` | `8082` | Port the portal listens on |
 | `NASA_API_KEY` (env var) | `DEMO_KEY` | NASA API key |
 
-## Bestandsstructuur
+## Project structure
 
 ```
 space-tracker/
-├── server.py               Python HTTP server + SGP4-baanberekening + NASA/ISS proxy
-├── space-tracker.service   systemd unit bestand
-├── deploy.sh                rsync-over-SSH deploy naar de Pi
+├── server.py               Python HTTP server + SGP4 orbit calculation + NASA/ISS proxy
+├── space-tracker.service   systemd unit file
+├── deploy.sh                rsync-over-SSH deploy to the Pi
+├── Dockerfile               Container image for the portal (alternative to systemd)
+├── docker-compose.yml       Runs the portal via Docker
 ├── static/
-│   ├── index.html           Landingspagina
-│   ├── iss.html              Live ISS/Tiangong-kaart
+│   ├── index.html           Landing page
+│   ├── iss.html              Live ISS/Tiangong map
 │   ├── nasa.html             NASA Open Data
-│   ├── artemis.html          Artemis missietijdlijn + RSS-feed
-│   ├── ruimteweer.html       Uitleg ruimteweer-codes
+│   ├── artemis.html          Artemis mission timeline + RSS feed
+│   ├── ruimteweer.html       Space weather code explanations
 │   ├── manifest.json         PWA manifest (home screen app)
 │   ├── icon-180.png          Apple touch icon
 │   ├── icon-192.png          PWA icon
-│   └── icon-512.png          PWA icon (groot)
-└── nasa_cache/                NASA API response cache (automatisch aangemaakt, niet in repo)
+│   └── icon-512.png          PWA icon (large)
+└── nasa_cache/                NASA API response cache (created automatically, not in repo)
 ```
 
-## Gebruik
+## Usage
 
-Open `http://<host>:8082` in een browser voor de landingspagina, of direct `/iss.html` voor de kaart.
+Open `http://<host>:8082` in a browser for the landing page, or go straight to `/iss.html` for the map.
 
-### Installeren als iPhone app (PWA)
+### Installing as an iPhone app (PWA)
 
-1. Open de portal in **Safari** op je iPhone
-2. Tik op het **deelicoon** (↑) → **"Zet op beginscherm"**
-3. Bevestig — de portal verschijnt als volledig scherm app op je beginscherm
+1. Open the portal in **Safari** on your iPhone
+2. Tap the **share icon** (↑) → **"Add to Home Screen"**
+3. Confirm — the portal now appears as a full-screen app on your home screen

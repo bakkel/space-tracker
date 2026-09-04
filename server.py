@@ -11,7 +11,7 @@ import math
 import os
 from datetime import datetime, timedelta
 
-PORT       = 8082
+PORT       = int(os.environ.get("PORT", 8082))
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 CACHE_DIR  = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nasa_cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
@@ -25,7 +25,7 @@ try:
     _HAS_SGP4 = True
 except ImportError:
     _HAS_SGP4 = False
-    print("[tiangong] sgp4 niet geïnstalleerd — voer uit: pip3 install sgp4")
+    print("[tiangong] sgp4 not installed — run: pip3 install sgp4")
 
 
 def _gmst_rad(jd):
@@ -36,7 +36,7 @@ def _gmst_rad(jd):
 
 
 def _eci_to_lla(r, gmst):
-    """ECI-positie (km) → (lat_deg, lon_deg, alt_km)"""
+    """ECI position (km) → (lat_deg, lon_deg, alt_km)"""
     RE, f = 6378.137, 1.0 / 298.257223563
     e2 = 2 * f - f * f
     cos_g, sin_g = math.cos(gmst), math.sin(gmst)
@@ -55,7 +55,7 @@ def _eci_to_lla(r, gmst):
 
 
 def _fetch_tle(norad_id):
-    """Haal TLE op voor gegeven NORAD-ID, cache 6 uur. Probeert drie bronnen."""
+    """Fetch TLE for the given NORAD ID, cached for 6 hours. Tries three sources."""
     now = time.time()
     if norad_id in _tle_cache:
         data, ts = _tle_cache[norad_id]
@@ -63,9 +63,9 @@ def _fetch_tle(norad_id):
             return data
 
     attempts = [
-        # JSON-API specifiek per NORAD-ID (meest betrouwbaar)
+        # JSON API specific to NORAD ID (most reliable)
         ("json", f"https://tle.ivanstanojevic.me/api/tle/{norad_id}"),
-        # CelesTrak stations-bestand (bevat ISS + Tiangong)
+        # CelesTrak stations file (contains ISS + Tiangong)
         ("txt",  "https://celestrak.org/SATCAT/stations.txt"),
         ("txt",  "https://www.celestrak.com/SATCAT/stations.txt"),
     ]
@@ -85,7 +85,7 @@ def _fetch_tle(norad_id):
                 if j.get("line1") and j.get("line2"):
                     data = {"line1": j["line1"], "line2": j["line2"]}
                     _tle_cache[norad_id] = (data, now)
-                    print(f"[tle] NORAD {norad_id} opgehaald (JSON) van {url}")
+                    print(f"[tle] NORAD {norad_id} fetched (JSON) from {url}")
                     return data
             else:
                 lines = [l.strip() for l in
@@ -95,9 +95,9 @@ def _fetch_tle(norad_id):
                     if line.startswith(f"1 {norad_id}") and i + 1 < len(lines):
                         data = {"line1": line, "line2": lines[i + 1]}
                         _tle_cache[norad_id] = (data, now)
-                        print(f"[tle] NORAD {norad_id} opgehaald (TXT) van {url}")
+                        print(f"[tle] NORAD {norad_id} fetched (TXT) from {url}")
                         return data
-                print(f"[tle] NORAD {norad_id} niet gevonden in {url} ({len(lines)} regels)")
+                print(f"[tle] NORAD {norad_id} not found in {url} ({len(lines)} lines)")
         except Exception as e:
             print(f"[tle] {url}: {e}")
 
@@ -113,12 +113,12 @@ def _nasa_cache_file(key):
 def _nasa_fetch(key, url, ttl=3600, max_time=10):
     import json as _json
     now = time.time()
-    # 1. Geheugen
+    # 1. Memory
     if key in _nasa_cache:
         data, ts = _nasa_cache[key]
         if now - ts < ttl:
             return data
-    # 2. Schijf (overleeft server-restarts)
+    # 2. Disk (survives server restarts)
     cf = _nasa_cache_file(key)
     if os.path.exists(cf):
         try:
@@ -131,7 +131,7 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
                 return data
         except Exception:
             pass
-    # 3. API ophalen
+    # 3. Fetch API
     try:
         result = subprocess.run(
             ["curl", "-s", "-L", "--max-time", str(max_time), url],
@@ -148,7 +148,7 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
                     pass
                 return result.stdout
             except ValueError:
-                print(f"[nasa] {key}: ongeldig JSON antwoord")
+                print(f"[nasa] {key}: invalid JSON response")
     except Exception as e:
         print(f"[nasa] fetch {key}: {e}")
     return _nasa_cache.get(key, (None, 0))[0]
@@ -156,12 +156,12 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
 
 def _mars_fetch():
     import json as _j
-    # Bereken huidige Martiaanse sol — geen manifest nodig
+    # Calculate current Martian sol — no manifest needed
     # Perseverance Sol 0 = 2021-02-18 00:00 UTC = Unix 1613606400
-    # Martiaanse sol = 24u 39m 35.244s = 88775.244 seconden
+    # Martian sol = 24h 39m 35.244s = 88775.244 seconds
     approx_sol = int((time.time() - 1613606400) / 88775.244)
 
-    # Probeer huidige sol en 2 daarvoor (nieuwste sol kan nog leeg zijn)
+    # Try current sol and 2 before it (newest sol may still be empty)
     for sol in range(approx_sol, max(1, approx_sol - 3), -1):
         raw = _nasa_fetch(f"mars_sol_{sol}",
             f"https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/photos?sol={sol}&page=1&api_key={NASA_KEY}",
@@ -171,7 +171,7 @@ def _mars_fetch():
         try:
             d = _j.loads(raw)
             if d.get("error"):
-                return raw   # propageer NASA-fout (rate limit etc.) naar client
+                return raw   # propagate NASA error (rate limit etc.) to client
             if d.get("photos"):
                 return raw
         except Exception:
@@ -190,7 +190,7 @@ def _artemis_fetch():
     try:
         result = subprocess.run(
             ["curl", "-s", "-L", "--max-time", "15",
-             "-A", "Mozilla/5.0 (compatible; Bakkel-Sky-Portal/1.0)",
+             "-A", "Mozilla/5.0 (compatible; SpaceTracker/1.0)",
              "https://www.nasa.gov/blogs/artemis/feed"],
             capture_output=True, timeout=19
         )
@@ -221,7 +221,7 @@ def _artemis_fetch():
         _nasa_cache["artemis_feed"] = (data, now)
         return data
     except Exception as e:
-        print(f"[artemis] fetch fout: {e}")
+        print(f"[artemis] fetch error: {e}")
         return cached[0] if cached else None
 
 
@@ -250,9 +250,9 @@ def iss_fetch_loop():
                     sat    = _Satrec.twoline2rv(tle["line1"], tle["line2"])
                     tle_ts = time.time()
                     fail   = 0
-                    print("[iss] TLE geladen, SGP4 actief")
+                    print("[iss] TLE loaded, SGP4 active")
                 except Exception as e:
-                    print(f"[iss] TLE parse fout: {e}")
+                    print(f"[iss] TLE parse error: {e}")
                     sat = None
             else:
                 fail += 1
@@ -286,7 +286,7 @@ def iss_fetch_loop():
                 with _iss_cache_lock:
                     _iss_cache = pos
         except Exception as ex:
-            print(f"[iss] loop fout: {ex}")
+            print(f"[iss] loop error: {ex}")
         time.sleep(5)
 
 
@@ -305,9 +305,9 @@ def tiangong_loop():
                     sat    = _Satrec.twoline2rv(tle["line1"], tle["line2"])
                     tle_ts = time.time()
                     fail   = 0
-                    print("[tiangong] TLE geladen, positieberekening actief")
+                    print("[tiangong] TLE loaded, position calculation active")
                 except Exception as e:
-                    print(f"[tiangong] TLE parse fout: {e}")
+                    print(f"[tiangong] TLE parse error: {e}")
                     sat = None
             else:
                 fail += 1
@@ -341,7 +341,7 @@ def tiangong_loop():
                 with _tiangong_lock:
                     _tiangong_cache = pos
         except Exception as ex:
-            print(f"[tiangong] loop fout: {ex}")
+            print(f"[tiangong] loop error: {ex}")
         time.sleep(5)
 
 
@@ -358,11 +358,11 @@ def astros_loop():
                     json.loads(result.stdout)  # valideer JSON
                     with _astros_lock:
                         _astros_cache = result.stdout
-                    print("[astros] bijgewerkt")
+                    print("[astros] updated")
                 except ValueError:
-                    print("[astros] ongeldig JSON antwoord")
+                    print("[astros] invalid JSON response")
         except Exception as ex:
-            print(f"[astros] loop fout: {ex}")
+            print(f"[astros] loop error: {ex}")
         time.sleep(900)  # 15 minuten
 
 

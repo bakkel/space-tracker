@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bakkel's Space Tracker</title>
+    <title>Space Tracker</title>
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0d1117" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -138,6 +138,20 @@
         border-color: var(--muted);
       }
 
+      footer {
+        text-align: center;
+        padding: 24px 0 8px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--text);
+      }
+
       @media (max-width: 600px) {
         main {
           padding: 28px 16px 60px;
@@ -150,12 +164,12 @@
   </head>
   <body>
     <header>
-      <h1>&#128302; Bakkel's <span>Space Tracker</span></h1>
+      <h1>&#128302; <span>Space Tracker</span></h1>
     </header>
 
     <main>
       <div class="intro">
-        <p>ruimtestations boven jouw hoofd.</p>
+        <p>Space stations above your head.</p>
       </div>
 
       <div class="card">
@@ -163,12 +177,12 @@
           <div class="card-icon">&#128302;</div>
           <div class="card-title">Space <span>Tracker</span></div>
           <div class="card-desc">
-            Volg de ISS en het Chinese ruimtestation Tiangong live op de
-            kaart. Met ruimteweer, bemanning en NASA open data.
+            Track the ISS and the Chinese Tiangong space station live on the
+            map. Includes space weather, crew and NASA open data.
           </div>
         </a>
         <div class="card-links">
-          <a href="/iss.html">&#128302; Live kaart</a>
+          <a href="/iss.html">&#128302; Live map</a>
           <a
             href="/nasa.html"
             style="display: inline-flex; align-items: center; gap: 5px"
@@ -187,9 +201,13 @@
             />
             Artemis</a
           >
-          <a href="/ruimteweer.html">&#9728; Ruimteweer</a>
+          <a href="/ruimteweer.html">&#9728; Space Weather</a>
         </div>
       </div>
+
+      <footer>
+        <a href="https://github.com/bakkel/space-tracker" target="_blank" rel="noopener">GitHub &#8599;</a>
+      </footer>
     </main>
   </body>
 </html>
