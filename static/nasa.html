@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASA Open Data — Bakkel's Space Tracker</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent: #388bfd;
+  --green:  #3fb950;
+  --yellow: #d29922;
+  --red:    #f85149;
+  --gold:   #ffd700;
+}
+
+html, body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 16px; height: 48px;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-size: 16px; font-weight: 600; white-space: nowrap; }
+header h1 span { color: var(--accent); }
+header a { color: var(--muted); text-decoration: none; font-size: 12px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; white-space: nowrap; }
+header a:hover { color: var(--text); border-color: var(--muted); }
+#update-time { flex: 1; text-align: center; color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+main { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
+main::after { content: ''; display: table; clear: both; }
+.sec { margin-bottom: 32px; }
+.sec:last-child { margin-bottom: 0; }
+.page-logo { position: fixed; left: max(16px, calc(50% - 696px)); top: 80px; width: 220px; height: auto; border-radius: 50%; z-index: 5; }
+
+/* ── Sectie cards ── */
+.sec {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.sec-head {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.sec-head h2 { font-size: 15px; font-weight: 600; }
+.sec-head .sub { font-size: 11px; color: var(--muted); }
+.sec-body { padding: 20px 22px; }
+
+/* ── APOD ── */
+#apod-img { width: 100%; max-height: 420px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: 14px; cursor: pointer; }
+#apod-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+#apod-date  { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+#apod-text  { font-size: 13px; color: var(--muted); line-height: 1.7; }
+#apod-video { width: 100%; aspect-ratio: 16/9; border: none; border-radius: 6px; margin-bottom: 14px; }
+
+/* ── EPIC ── */
+.epic-wrap { display: flex; gap: 20px; align-items: flex-start; }
+#epic-img   { width: 260px; flex-shrink: 0; border-radius: 6px; display: block; }
+.epic-info  { flex: 1; }
+.epic-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.epic-info p  { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 6px; }
+
+/* ── MARS ── */
+.mars-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.mars-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.mars-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.mars-card .mars-meta { padding: 6px 8px; font-size: 10px; color: var(--muted); line-height: 1.4; }
+.mars-card .mars-meta strong { color: var(--text); display: block; font-size: 11px; }
+
+/* ── NEO ── */
+.neo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.neo-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 0 8px 8px 0; border-bottom: 1px solid var(--border); }
+.neo-table td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--bg3); vertical-align: middle; }
+.neo-table tr:last-child td { border-bottom: none; }
+.haz-badge { background: rgba(248,81,73,.15); color: var(--red); border: 1px solid rgba(248,81,73,.35); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 600; }
+
+/* ── EONET ── */
+.eonet-list { display: flex; flex-direction: column; gap: 8px; }
+.eonet-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: var(--bg3); border-radius: 6px; border: 1px solid var(--border); }
+.eonet-icon { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+.eonet-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.eonet-meta  { font-size: 11px; color: var(--muted); }
+.cat-badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; margin-right: 4px; border: 1px solid var(--border); color: var(--muted); background: var(--bg); }
+
+/* ── Ruimteweer ── */
+.sw-grid { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; }
+.sw-status-badge { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 6px; white-space: nowrap; }
+.sw-quiet  { background: #3fb95018; color: var(--green);  border: 1px solid #3fb95044; }
+.sw-active { background: #d2992218; color: var(--yellow); border: 1px solid #d2992244; }
+.sw-storm  { background: #f8514918; color: var(--red);    border: 1px solid #f8514944; }
+.sw-tags   { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.sw-tag    { font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); }
+.sw-events { font-size: 12px; }
+.sw-row    { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--bg3); }
+.sw-row:last-child { border-bottom: none; }
+
+.loading { color: var(--muted); font-size: 13px; padding: 8px 0; }
+.error   { color: var(--red);   font-size: 13px; padding: 8px 0; }
+
+@media (max-width: 640px) {
+  main { padding: 16px 12px 48px; }
+  .sec { margin-bottom: 20px; }
+}
+@media (max-width: 1440px) {
+  .page-logo { display: none; }
+  .epic-wrap { flex-direction: column; }
+  #epic-img   { width: 100%; }
+  .mars-grid  { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+}
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; height: auto; min-height: 44px; padding: 6px 10px; gap: 6px; }
+  header h1 { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img src="/nasa.png" style="height:22px;width:auto;vertical-align:middle;margin-right:6px;border-radius:50%"> NASA <span>Open Data</span></h1>
+  <a href="/iss.html">&#8592; Space Tracker</a>
+  <a href="/">&#127760; Home</a>
+  <div id="update-time">laden…</div>
+  <a href="/artemis.html" style="display:inline-flex;align-items:center;gap:5px"><img src="/artemis.png" style="height:14px;width:auto;border-radius:2px"> Artemis</a>
+  <a href="/ruimteweer.html">&#9728; Ruimteweer</a>
+</header>
+
+<main>
+<img class="page-logo" src="/nasa.png" alt="NASA">
+
+  <!-- RUIMTEWEER -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#9728; Ruimteweer</h2>
+      <span class="sub">NASA DONKI — Space Weather Notifications (7 dagen)</span>
+      <a href="/ruimteweer.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">meer info ›</a>
+    </div>
+    <div class="sec-body" id="donki-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+  <!-- APOD -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#128247; Astronomische Foto van de Dag</h2>
+      <span class="sub">NASA APOD</span>
+    </div>
+    <div class="sec-body" id="apod-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+  <!-- EPIC -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#127758; Aardfoto vanuit de ruimte</h2>
+      <span class="sub">NASA EPIC — DSCOVR-satelliet op 1,5 miljoen km afstand</span>
+    </div>
+    <div class="sec-body" id="epic-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+  <!-- MARS -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#128308; Mars Rover — Laatste Beelden</h2>
+      <span class="sub">NASA Perseverance — meest recente sol</span>
+    </div>
+    <div class="sec-body" id="mars-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+  <!-- NEO WEEK -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#9762; Asteroïden komende 7 dagen</h2>
+      <span class="sub">NASA Near Earth Objects</span>
+    </div>
+    <div class="sec-body" id="neo-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+  <!-- EONET -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#127757; Actieve Aardgebeurtenissen</h2>
+      <span class="sub">NASA EONET — Earth Observatory Natural Event Tracker</span>
+    </div>
+    <div class="sec-body" id="eonet-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── TIJD ──────────────────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('update-time').textContent =
+    new Date().toLocaleTimeString('nl', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── DONKI ────────────────────────────────────────────────────────────────────
+const DONKI_TYPES = {
+  CME: 'Coronale massa-uitstoot', FLR: 'Zonnevlam', GST: 'Geomagnetische storm',
+  IPS: 'Interplanetaire schok',   SEP: 'Energetische deeltjes',
+  MPC: 'Magnetopauze-oversteek',  RBE: 'Stralingsgordelversterking',
+};
+const DONKI_ANCHORS = { CME: 'sw-cme', FLR: 'sw-flr', GST: 'sw-gst', IPS: 'sw-ips', SEP: 'sw-sep', MPC: 'sw-mpc', RBE: 'sw-rbe' };
+
+async function loadDonki() {
+  const el = document.getElementById('donki-body');
+  try {
+    const events = await fetch('/api/nasa/donki').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    if (!Array.isArray(events) || !events.length) { el.innerHTML = '<div class="loading">Geen meldingen beschikbaar.</div>'; return; }
+
+    const now = Date.now();
+    const h24 = now - 86400000;
+    const counts = {};
+    const recent = [];
+    for (const e of events) {
+      counts[e.messageType] = (counts[e.messageType] || 0) + 1;
+      const t = new Date((e.messageIssueTime || '').endsWith('Z') ? e.messageIssueTime : e.messageIssueTime + 'Z').getTime();
+      if (t > h24) recent.push(e);
+    }
+
+    let cls, label;
+    if (recent.some(e => e.messageType === 'GST'))              { cls = 'sw-storm';  label = '&#9940; Geomagnetische storm actief'; }
+    else if (recent.some(e => ['CME','FLR'].includes(e.messageType))) { cls = 'sw-active'; label = '&#9888; Verhoogde activiteit'; }
+    else                                                          { cls = 'sw-quiet';  label = '&#10003; Rustig'; }
+
+    const tags = Object.entries(counts).map(([t, n]) => {
+      const href = DONKI_ANCHORS[t] ? `/ruimteweer.html#${DONKI_ANCHORS[t]}` : '/ruimteweer.html';
+      return `<a href="${href}" target="_blank" style="text-decoration:none"><span class="sw-tag">${DONKI_TYPES[t]||t} <b>${n}</b></span></a>`;
+    }).join('');
+
+    const rows = [...events].slice(-8).reverse().map(e => {
+      const d  = new Date((e.messageIssueTime||'').endsWith('Z') ? e.messageIssueTime : e.messageIssueTime+'Z');
+      const ds = d.toLocaleDateString('nl', { month:'short', day:'numeric', timeZone:'UTC' });
+      const ts = d.toLocaleTimeString('nl', { hour:'2-digit', minute:'2-digit', timeZone:'UTC' }) + ' UTC';
+      const href = DONKI_ANCHORS[e.messageType] ? `/ruimteweer.html#${DONKI_ANCHORS[e.messageType]}` : '/ruimteweer.html';
+      return `<div class="sw-row">
+        <a href="${href}" target="_blank" style="color:var(--text);text-decoration:none">${DONKI_TYPES[e.messageType]||e.messageType}</a>
+        <span style="color:var(--muted)">${ds} ${ts}</span>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="sw-grid">
+        <span class="sw-status-badge ${cls}">${label}</span>
+        <div>
+          <div class="sw-tags">${tags}</div>
+          <div class="sw-events">${rows}</div>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+// ── APOD ─────────────────────────────────────────────────────────────────────
+async function loadApod() {
+  const el = document.getElementById('apod-body');
+  try {
+    const d = await fetch('/api/nasa/apod').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    if (!d || !d.title) throw new Error('geen data');
+
+    const media = d.media_type === 'image'
+      ? `<a href="${d.hdurl || d.url}" target="_blank"><img id="apod-img" src="${d.url}" alt="${d.title}"></a>`
+      : `<iframe id="apod-video" src="${d.url}" allowfullscreen title="${d.title}"></iframe>`;
+
+    const excerpt = d.explanation && d.explanation.length > 600
+      ? d.explanation.slice(0, 600) + '…'
+      : (d.explanation || '');
+
+    el.innerHTML = `
+      ${media}
+      <div id="apod-title">${d.title}</div>
+      <div id="apod-date">${d.date}${d.copyright ? ' — © ' + d.copyright : ''}</div>
+      <div id="apod-text">${excerpt}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+// ── EPIC ─────────────────────────────────────────────────────────────────────
+async function loadEpic() {
+  const el = document.getElementById('epic-body');
+  try {
+    const data = await fetch('/api/nasa/epic').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    if (!data || !data.length) throw new Error('geen data');
+
+    const item = data[0];
+    const [datePart] = item.date.split(' ');
+    const [y, m, d]  = datePart.split('-');
+    const thumbUrl   = `https://epic.gsfc.nasa.gov/archive/natural/${y}/${m}/${d}/thumbs/${item.image}.jpg`;
+    const fullUrl    = `https://epic.gsfc.nasa.gov/archive/natural/${y}/${m}/${d}/png/${item.image}.png`;
+    const lat  = item.centroid_coordinates?.lat?.toFixed(1) ?? '–';
+    const lon  = item.centroid_coordinates?.lon?.toFixed(1) ?? '–';
+
+    el.innerHTML = `
+      <div class="epic-wrap">
+        <a href="${fullUrl}" target="_blank">
+          <img id="epic-img" src="${thumbUrl}" alt="Earth from EPIC" loading="lazy">
+        </a>
+        <div class="epic-info">
+          <h3>Aarde — ${datePart}</h3>
+          <p>Opgenomen door de EPIC-camera aan boord van de DSCOVR-satelliet op het Lagrangepunt L1, op circa 1,5 miljoen km van de aarde.</p>
+          <p><b>Beeldcentrum:</b> ${lat}° lat / ${lon}° lon</p>
+          <p style="font-size:12px">${item.caption || ''}</p>
+          <p style="margin-top:10px"><a href="${fullUrl}" target="_blank" style="color:var(--accent);font-size:12px">Volledige resolutie ↗</a></p>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+// ── MARS ─────────────────────────────────────────────────────────────────────
+async function loadMars() {
+  const el = document.getElementById('mars-body');
+  try {
+    const resp = await fetch('/api/nasa/mars');
+    if (!resp.ok) throw new Error(`server ${resp.status}`);
+    let data;
+    try { data = await resp.json(); } catch(_) { throw new Error('ongeldig antwoord'); }
+
+    if (data.error) throw new Error(data.error.message || data.error.code || 'NASA fout');
+    const photos = data.photos || [];
+    if (!photos.length) {
+      el.innerHTML = '<div class="loading" style="color:var(--muted)">Geen recente foto\'s beschikbaar.</div>';
+      return;
+    }
+
+    const shown = photos.slice(0, 5);
+    const p0    = shown[0];
+    const cards = shown.map(p => {
+      const src = (p.img_src || '').replace(/^http:/i, 'https:');
+      const cam = p.camera?.full_name || p.camera?.name || '–';
+      return `<div class="mars-card">
+        <a href="${src}" target="_blank" rel="noopener">
+          <img src="${src}" alt="Mars foto" loading="lazy">
+        </a>
+        <div class="mars-meta">
+          <strong>${cam}</strong>
+          Sol ${p.sol}
+        </div>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        Sol ${p0.sol} — ${p0.earth_date} — rover: ${p0.rover?.name || 'Perseverance'}
+      </p>
+      <div class="mars-grid">${cards}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+// ── NEO WEEK ─────────────────────────────────────────────────────────────────
+async function loadNeoWeek() {
+  const el = document.getElementById('neo-body');
+  try {
+    const data      = await fetch('/api/nasa/neo/week').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const asteroids = Object.entries(data.near_earth_objects || {})
+      .flatMap(([date, list]) => list.map(a => ({ ...a, _date: date })));
+
+    asteroids.sort((a, b) =>
+      parseFloat(a.close_approach_data[0].miss_distance.kilometers) -
+      parseFloat(b.close_approach_data[0].miss_distance.kilometers)
+    );
+
+    const rows = asteroids.slice(0, 20).map(a => {
+      const ca    = a.close_approach_data[0];
+      const dist  = (parseFloat(ca.miss_distance.kilometers) / 1e6).toFixed(2);
+      const diam  = a.estimated_diameter.kilometers;
+      const size  = `${diam.estimated_diameter_min.toFixed(2)}–${diam.estimated_diameter_max.toFixed(2)} km`;
+      const haz   = a.is_potentially_hazardous_asteroid;
+      const name  = a.name.replace(/^\(|\)$/g, '');
+      return `<tr>
+        <td>${a._date}</td>
+        <td style="color:${haz ? 'var(--red)' : 'var(--text)'}">${name}${haz ? ' <span class="haz-badge">⚠ Gevaarlijk</span>' : ''}</td>
+        <td>${dist}M km</td>
+        <td style="color:var(--muted)">${size}</td>
+        <td style="color:var(--muted)">${Math.round(parseFloat(ca.relative_velocity.kilometers_per_hour)).toLocaleString('nl')} km/u</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${asteroids.length} objecten gevonden — gesorteerd op dichtstbijzijnde passage</p>
+      <table class="neo-table">
+        <thead><tr>
+          <th>Datum</th><th>Naam</th><th>Afstand</th><th>Grootte</th><th>Snelheid</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+// ── EONET ────────────────────────────────────────────────────────────────────
+const EONET_ICONS = {
+  wildfires:     '🔥',
+  volcanoes:     '🌋',
+  severeStorms:  '⛈️',
+  floods:        '🌊',
+  earthquakes:   '🏔️',
+  drought:       '☀️',
+  dustHaze:      '🌫️',
+  landslides:    '⛰️',
+  snow:          '❄️',
+  seaLakeIce:    '🧊',
+  waterColor:    '💧',
+  tempExtremes:  '🌡️',
+  manmade:       '🏭',
+};
+
+async function loadEonet() {
+  const el = document.getElementById('eonet-body');
+  try {
+    const data   = await fetch('/api/nasa/eonet').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const events = data.events || [];
+    if (!events.length) { el.innerHTML = '<div class="loading">Geen actieve gebeurtenissen</div>'; return; }
+
+    el.innerHTML = `
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${events.length} actieve gebeurtenissen</p>
+      <div class="eonet-list">
+        ${events.map(ev => {
+          const cat    = ev.categories?.[0];
+          const icon   = cat ? (EONET_ICONS[cat.id] || '🌐') : '🌐';
+          const latest = ev.geometry?.slice(-1)[0];
+          const date   = latest?.date ? latest.date.slice(0, 10) : '–';
+          const src    = ev.sources?.[0];
+          const link   = src ? `<a href="${src.url}" target="_blank" style="color:var(--accent);font-size:11px">bron ↗</a>` : '';
+          const badge  = cat ? `<span class="cat-badge">${cat.title}</span>` : '';
+          return `<div class="eonet-item">
+            <div class="eonet-icon">${icon}</div>
+            <div>
+              <div class="eonet-title">${ev.title}</div>
+              <div class="eonet-meta">${badge} ${date} ${link}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+loadDonki();
+loadApod();
+loadEpic();
+loadMars();
+loadNeoWeek();
+loadEonet();
+</script>
+</body>
+</html>

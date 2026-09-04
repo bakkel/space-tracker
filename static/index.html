@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bakkel's Space Tracker</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0d1117;
+        --bg2: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --gold: #ffd700;
+      }
+
+      html,
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 24px;
+        height: 52px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+      }
+      header h1 {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+      }
+      header h1 span {
+        color: var(--gold);
+      }
+
+      main {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+
+      .intro {
+        margin-bottom: 40px;
+        text-align: center;
+      }
+      .intro p {
+        color: var(--muted);
+        font-size: 17px;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .card:hover {
+        border-color: var(--muted);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .card-main {
+        display: block;
+        text-decoration: none;
+        color: var(--text);
+        padding: 28px 28px 20px;
+      }
+
+      .card-icon {
+        font-size: 32px;
+        line-height: 1;
+        margin-bottom: 14px;
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .card-title span {
+        color: var(--gold);
+      }
+
+      .card-desc {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .card-links {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--border);
+        padding: 14px 28px 18px;
+      }
+      .card-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 11px;
+        padding: 2px 8px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+      }
+      .card-links a:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+
+      @media (max-width: 600px) {
+        main {
+          padding: 28px 16px 60px;
+        }
+        header {
+          padding: 10px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&#128302; Bakkel's <span>Space Tracker</span></h1>
+    </header>
+
+    <main>
+      <div class="intro">
+        <p>ruimtestations boven jouw hoofd.</p>
+      </div>
+
+      <div class="card">
+        <a href="/iss.html" class="card-main">
+          <div class="card-icon">&#128302;</div>
+          <div class="card-title">Space <span>Tracker</span></div>
+          <div class="card-desc">
+            Volg de ISS en het Chinese ruimtestation Tiangong live op de
+            kaart. Met ruimteweer, bemanning en NASA open data.
+          </div>
+        </a>
+        <div class="card-links">
+          <a href="/iss.html">&#128302; Live kaart</a>
+          <a
+            href="/nasa.html"
+            style="display: inline-flex; align-items: center; gap: 5px"
+            ><img
+              src="/nasa.png"
+              style="height: 13px; width: auto; border-radius: 50%"
+            />
+            NASA data</a
+          >
+          <a
+            href="/artemis.html"
+            style="display: inline-flex; align-items: center; gap: 5px"
+            ><img
+              src="/artemis.png"
+              style="height: 13px; width: auto; border-radius: 2px"
+            />
+            Artemis</a
+          >
+          <a href="/ruimteweer.html">&#9728; Ruimteweer</a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruimteweer — FR24 ADS-B Portal</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent: #388bfd;
+  --green:  #3fb950;
+  --yellow: #d29922;
+  --red:    #f85149;
+  --orange: #e3702a;
+  --purple: #bc8cff;
+}
+
+html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+
+header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 16px; height: 48px;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+}
+header h1 { font-size: 16px; font-weight: 600; white-space: nowrap; }
+header h1 span { color: var(--yellow); }
+header a { color: var(--muted); text-decoration: none; font-size: 12px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; white-space: nowrap; }
+header a:hover { color: var(--text); border-color: var(--muted); }
+
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+
+h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 36px 0 14px; }
+
+p { color: var(--muted); margin-bottom: 12px; max-width: 680px; }
+
+.intro {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px 20px; margin-bottom: 32px;
+}
+.intro p { margin: 0; }
+
+/* ── Event cards ── */
+.event-cards { display: flex; flex-direction: column; gap: 8px; }
+.event-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; display: flex; gap: 16px; align-items: flex-start;
+  scroll-margin-top: 72px;
+}
+.event-card:target { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.event-badge {
+  font-family: monospace; font-size: 15px; font-weight: 700;
+  min-width: 52px; padding: 6px 8px; border-radius: 6px;
+  text-align: center; flex-shrink: 0; letter-spacing: 1px;
+  background: var(--bg3); color: var(--text);
+}
+
+.event-body { flex: 1; min-width: 0; }
+.event-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.event-nl   { font-size: 12px; color: var(--muted); margin-bottom: 6px; font-style: italic; }
+.event-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+.badge-cme    { background: rgba(227,112,42,.15); color: var(--orange); border: 1px solid rgba(227,112,42,.4); }
+.badge-flr    { background: rgba(210,153,34,.15); color: var(--yellow); border: 1px solid rgba(210,153,34,.4); }
+.badge-gst    { background: rgba(248,81,73,.15);  color: var(--red);    border: 1px solid rgba(248,81,73,.4); }
+.badge-ips    { background: rgba(56,139,253,.12); color: var(--accent); border: 1px solid rgba(56,139,253,.4); }
+.badge-sep    { background: rgba(188,140,255,.12);color: var(--purple); border: 1px solid rgba(188,140,255,.4); }
+.badge-mpc    { background: rgba(63,185,80,.12);  color: var(--green);  border: 1px solid rgba(63,185,80,.4); }
+.badge-rbe    { background: rgba(188,140,255,.12);color: var(--purple); border: 1px solid rgba(188,140,255,.4); }
+
+/* ── Schalen ── */
+.scale-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.scale-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px;
+}
+.scale-card .scale-code { font-family: monospace; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.scale-card .scale-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.scale-card .scale-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.scale-g  .scale-code { color: var(--red);    }
+.scale-s  .scale-code { color: var(--orange); }
+.scale-r  .scale-code { color: var(--yellow); }
+.scale-kp .scale-code { color: var(--accent); }
+
+/* ── Impact tabel ── */
+.impact-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+.impact-table th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--border); }
+.impact-table td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.impact-table tr:last-child td { border-bottom: none; }
+.impact-table td:first-child { font-family: monospace; font-weight: 700; white-space: nowrap; }
+.level-g5 { color: var(--red);    }
+.level-g4 { color: var(--orange); }
+.level-g3 { color: var(--yellow); }
+.level-g2 { color: var(--green);  }
+.level-g1 { color: var(--muted);  }
+
+@media (max-width: 600px) {
+  main { padding: 20px 12px 48px; }
+  .event-badge { font-size: 13px; min-width: 44px; }
+}
+
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; height: auto; min-height: 44px; padding: 6px 10px; gap: 6px; }
+  header h1 { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#9728; Ruimte<span>weer</span></h1>
+  <a href="/iss.html">&#8592; Space Tracker</a>
+</header>
+
+<main>
+  <h2>Ruimteweer — uitleg &amp; codes</h2>
+
+  <div class="intro">
+    <p>Ruimteweer omvat alle activiteit van de zon die invloed heeft op de omgeving van de Aarde: energetische deeltjes, magnetische velden en elektromagnetische straling. De gegevens op de Space Tracker komen van NASA's <strong>DONKI</strong>-systeem (Space Weather Database Of Notifications, Knowledge, Information) en worden bijgewerkt zodra er een nieuw event is.</p>
+  </div>
+
+  <h3>&#9889; Event-typen</h3>
+  <div class="event-cards">
+
+    <div class="event-card" id="sw-cme">
+      <div class="event-badge badge-cme">CME</div>
+      <div class="event-body">
+        <div class="event-name">Coronal Mass Ejection</div>
+        <div class="event-nl">Coronale massa-uitstoot</div>
+        <div class="event-desc">Een CME is een enorme wolk geladen deeltjes (plasma) die met hoge snelheid uit de corona van de zon wordt uitgestoten — tot 3.000 km/s. Als deze wolk de Aarde bereikt (1–3 dagen reistijd) kan hij een geomagnetische storm veroorzaken. Sterke CME's storen radiocommunicatie, satellietnavigatie (GPS) en kunnen in extreme gevallen stroomnetwerken uitschakelen. CME's zijn zichtbaar als kroonvormige uitbarstingen in coronagraaf-opnamen.</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-flr">
+      <div class="event-badge badge-flr">FLR</div>
+      <div class="event-body">
+        <div class="event-name">Solar Flare</div>
+        <div class="event-nl">Zonnevlam</div>
+        <div class="event-desc">Een plotselinge intense opvlamming aan het zonoppervlak die röntgenstraling en ultraviolette straling uitzendt. Een zonnevlam reist met lichtsnelheid en bereikt de Aarde in ongeveer 8 minuten. De straling ioniseert de bovenste atmosfeer (ionosfeer) en verstoort kortegolfradio, met name aan de dagzijde van de Aarde. Vlaamkracht wordt ingedeeld van A (zwakst) via B, C, M naar X (sterkst); elke klasse is 10× sterker dan de vorige. Klasse X10+ zijn extreme vlamen.</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-gst">
+      <div class="event-badge badge-gst">GST</div>
+      <div class="event-body">
+        <div class="event-name">Geomagnetic Storm</div>
+        <div class="event-nl">Geomagnetische storm</div>
+        <div class="event-desc">Een geomagnetische storm ontstaat wanneer een CME of een snelle zonnewind de aardse magnetosfeer treft en verstoort. De sterkte wordt gemeten met de <strong>Kp-index</strong> (0–9) of de G-schaal (G1–G5). Een G1-storm heeft weinig effect; een G5 kan stroomnetwerken en satellites beschadigen en veroorzaakt poollichten tot op lage breedtegraden. Nederland ziet poollichten typisch bij G3 en hoger.</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-ips">
+      <div class="event-badge badge-ips">IPS</div>
+      <div class="event-body">
+        <div class="event-name">Interplanetary Shock</div>
+        <div class="event-nl">Interplanetaire schokgolf</div>
+        <div class="event-desc">Een schokgolf in de interplanetaire ruimte, die ontstaat wanneer een snelle CME een tragere zonnewind inhaalt en een samengeperste schokfront vormt. DONKI registreert wanneer deze schok meetapparatuur bij de Aarde (bijv. de DSCOVR-satelliet op 1 miljoen km) passeert. IPS is doorgaans een voorloper van een geomagnetische storm die enkele uren later volgt.</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-sep">
+      <div class="event-badge badge-sep">SEP</div>
+      <div class="event-body">
+        <div class="event-name">Solar Energetic Particles</div>
+        <div class="event-nl">Zonne-energetische deeltjes</div>
+        <div class="event-desc">Hoog-energetische protonen en elektronen die bij sterke zonnevlamen of CME-schokfronten worden versneld. Ze bereiken de Aarde in minuten tot uren en zijn gevaarlijk voor astronauten buiten de magnetosfeer (bijv. op de maan of in de diepe ruimte). Op polaire vluchthoogtes kunnen piloten en passagiers een verhoogde stralingsdosis ontvangen. De sterkte wordt gemeten op de S-schaal (S1–S5).</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-mpc">
+      <div class="event-badge badge-mpc">MPC</div>
+      <div class="event-body">
+        <div class="event-name">Magnetopause Crossing</div>
+        <div class="event-nl">Magnetopauze-oversteek</div>
+        <div class="event-desc">De magnetopauze is de grens tussen de aardse magnetosfeer en de interplanetaire ruimte. Normaal bevindt deze grens zich op 10–12 aardstralen afstand aan de dagzijde. Een sterke CME kan de magnetopauze samendrukken tot 6 aardstralen of minder — dichter dan geostationaire satellites (6,6 aardstralen). Een MPC-melding betekent dat de magnetopauze de positie van een observerend ruimtevaartuig heeft bereikt.</div>
+      </div>
+    </div>
+
+    <div class="event-card" id="sw-rbe">
+      <div class="event-badge badge-rbe">RBE</div>
+      <div class="event-body">
+        <div class="event-name">Radiation Belt Enhancement</div>
+        <div class="event-nl">Stralingsgordelversterking</div>
+        <div class="event-desc">De Van Allen-stralingsgordes zijn twee donut-vormige zones vol hoog-energetische deeltjes rondom de Aarde. Een RBE treedt op wanneer de buitenste gordel tijdelijk sterk versterkt wordt door zonne-activiteit. Dit verhoogt de stralingsblootstelling voor satellites in een baan door de buitenste gordel (MEO en sommige GEO-banen) en kan elektronische componenten beschadigen.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h3>&#128202; Ernstschalen</h3>
+  <p>NOAA (het Amerikaanse meteorologisch instituut) gebruikt drie vijfpuntsschalen voor ruimteweer, analoog aan de Beaufortschaal voor wind.</p>
+
+  <div class="scale-grid">
+    <div class="scale-card scale-g">
+      <div class="scale-code">G1 – G5</div>
+      <div class="scale-name">Geomagnetische storm</div>
+      <div class="scale-desc">G1 = klein; G5 = extreem. Gebaseerd op de Kp-index. Nederland ziet poollicht bij G3+.</div>
+    </div>
+    <div class="scale-card scale-s">
+      <div class="scale-code">S1 – S5</div>
+      <div class="scale-name">Zonne-deeltjes­storm</div>
+      <div class="scale-desc">S1 = klein; S5 = extreem. Meet hoog-energetische protonen. Gevaarlijk voor astronauten buiten de magnetosfeer.</div>
+    </div>
+    <div class="scale-card scale-r">
+      <div class="scale-code">R1 – R5</div>
+      <div class="scale-name">Radioverstoringen</div>
+      <div class="scale-desc">R1 = klein; R5 = extreem. Gebaseerd op de röntgenflux van zonnevlamen. Treft kortegolfradio op de dagzijde.</div>
+    </div>
+    <div class="scale-card scale-kp">
+      <div class="scale-code">Kp 0–9</div>
+      <div class="scale-name">Planetaire index</div>
+      <div class="scale-desc">Elke 3 uur bijgewerkt op basis van meetstations wereldwijd. Kp ≥ 5 = geomagnetische storm. Kp ≥ 7 = poollicht in Nederland.</div>
+    </div>
+  </div>
+
+  <h3>&#9888; Wat betekent het voor jou?</h3>
+  <table class="impact-table">
+    <thead>
+      <tr>
+        <th>G-schaal</th>
+        <th>Effect op aarde</th>
+        <th>Poollicht</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="level-g5">G5 (Kp 9)</td>
+        <td>Stroomuitval mogelijk, satellites verstoord, radiopropagatie verdwenen</td>
+        <td>Tot Florida en Spanje zichtbaar</td>
+      </tr>
+      <tr>
+        <td class="level-g4">G4 (Kp 8)</td>
+        <td>Stroomnetwerken onder spanning, GPS-fouten, HF-radio zwaar verstoord</td>
+        <td>Zichtbaar tot Noord-Duitsland / Denemarken</td>
+      </tr>
+      <tr>
+        <td class="level-g3">G3 (Kp 7)</td>
+        <td>Navigatieproblemen GPS, stroomschommelingen, satellietsleepkracht verhoogd</td>
+        <td>Zichtbaar in Noord-Nederland bij donkere hemel</td>
+      </tr>
+      <tr>
+        <td class="level-g2">G2 (Kp 6)</td>
+        <td>Lichte stroomschommelingen, HF-radio verstoord op hogere breedtegraden</td>
+        <td>Mogelijk zichtbaar in Friesland / Groningen</td>
+      </tr>
+      <tr>
+        <td class="level-g1">G1 (Kp 5)</td>
+        <td>Kleine verstoringen in stroomnetwerken, beperkt effect op satellites</td>
+        <td>Zichtbaar in Scandinavië en Noord-Canada</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>&#128506; Solaire vlaamklassen</h3>
+  <p>Zonnevlamen worden ingedeeld op basis van de röntgenflux gemeten door de GOES-satellite:</p>
+
+  <div class="event-cards">
+    <div class="event-card">
+      <div class="event-badge" style="background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.4)">X</div>
+      <div class="event-body">
+        <div class="event-name">Extreme vlam</div>
+        <div class="event-desc">Sterkste klasse. X1 = minimumwaarde, X10+ = uitzonderlijk. De krachtigste ooit gemeten was X28 in november 2003. Een X-vlam kan tegelijk een CME afvuren en veroorzaakt brede radioverstoringen.</div>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-badge" style="background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.4)">M</div>
+      <div class="event-body">
+        <div class="event-name">Middelgrote vlam</div>
+        <div class="event-desc">10× zwakker dan X-klasse. M-vlamen veroorzaken kortdurende radioverstoringen aan de dagzijde. M5 en hoger gaan regelmatig gepaard met CME's.</div>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-badge" style="background:rgba(56,139,253,.12);color:var(--accent);border:1px solid rgba(56,139,253,.4)">C</div>
+      <div class="event-body">
+        <div class="event-name">Kleine vlam</div>
+        <div class="event-desc">Nauwelijks merkbaar op aarde. C-vlamen zijn het meest frequent en gelden als achtergrondactiviteit van de zon, zeker tijdens het zonnemaximum.</div>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-badge" style="background:var(--bg3)">B / A</div>
+      <div class="event-body">
+        <div class="event-name">Minimale activiteit</div>
+        <div class="event-desc">Vlamen onder de C-klasse. B-vlamen zijn 10× zwakker dan C, A-vlamen 10× zwakker dan B. Geen meetbare effecten op aarde. Worden ook wel "microflares" genoemd.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>&#128268; Databron</h3>
+  <p>De ruimteweergegevens op de Space Tracker komen van de <strong>NASA DONKI API</strong> (api.nasa.gov). DONKI wordt dagelijks bijgewerkt door ruimteweerprognostici van het NASA Goddard Space Flight Center. De data toont meldingen over de afgelopen 7 dagen.</p>
+  <p>Actuele waarschuwingen en meer detail: <strong>spaceweather.com</strong> of het NOAA Space Weather Prediction Center (spaceweather.noaa.gov).</p>
+
+</main>
+
+</body>
+</html>

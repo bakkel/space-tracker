@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artemis — Bakkel's Space Tracker</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent: #388bfd;
+  --green:  #3fb950;
+  --yellow: #d29922;
+  --red:    #f85149;
+  --gold:   #ffd700;
+  --orange: #e3721b;
+}
+
+html, body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 16px; height: 48px;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-size: 16px; font-weight: 600; white-space: nowrap; }
+header h1 span { color: var(--orange); }
+header a { color: var(--muted); text-decoration: none; font-size: 12px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; white-space: nowrap; }
+header a:hover { color: var(--text); border-color: var(--muted); }
+#update-time { flex: 1; text-align: center; color: var(--muted); font-size: 11px; }
+
+main { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
+main::after { content: ''; display: table; clear: both; }
+.sec { margin-bottom: 32px; }
+.sec:last-child { margin-bottom: 0; }
+.page-logo { position: fixed; left: max(16px, calc(50% - 696px)); top: 80px; width: 220px; height: auto; border-radius: 8px; z-index: 5; }
+
+/* ── Sectie cards ── */
+.sec { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.sec-head { padding: 14px 22px; border-bottom: 1px solid var(--border); background: var(--bg3); display: flex; align-items: baseline; gap: 10px; }
+.sec-head h2 { font-size: 15px; font-weight: 600; }
+.sec-head .sub { font-size: 11px; color: var(--muted); }
+.sec-body { padding: 20px 22px; }
+
+/* ── Tijdlijn ── */
+.timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.mission-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; display: flex; flex-direction: column; gap: 8px;
+  position: relative; overflow: hidden;
+}
+.mission-card.done   { border-color: #3fb95044; }
+.mission-card.active { border-color: #d2992244; }
+.mission-card.future { opacity: .75; }
+.mission-name { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
+.mission-sub  { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+.mission-date { font-size: 12px; color: var(--muted); }
+.mission-desc { font-size: 12px; color: var(--muted); line-height: 1.5; flex: 1; }
+.status-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px; margin-top: auto; width: fit-content;
+}
+.badge-done   { background: #3fb95018; color: var(--green);  border: 1px solid #3fb95044; }
+.badge-active { background: #d2992218; color: var(--yellow); border: 1px solid #d2992244; }
+.badge-future { background: var(--bg);  color: var(--muted);  border: 1px solid var(--border); }
+.mission-stripe {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.stripe-done   { background: var(--green); }
+.stripe-active { background: var(--yellow); }
+.stripe-future { background: var(--border); }
+
+/* ── Blog feed ── */
+.feed-grid { display: flex; flex-direction: column; gap: 16px; }
+.feed-item {
+  display: grid; grid-template-columns: 160px 1fr; gap: 16px;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden; text-decoration: none; color: var(--text);
+  transition: border-color .15s;
+}
+.feed-item:hover { border-color: var(--accent); }
+.feed-img { width: 160px; aspect-ratio: 16/9; object-fit: cover; display: block; flex-shrink: 0; }
+.feed-img-placeholder { width: 160px; aspect-ratio: 16/9; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.feed-content { padding: 14px 16px 14px 0; display: flex; flex-direction: column; gap: 6px; }
+.feed-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.feed-meta  { font-size: 11px; color: var(--muted); }
+.feed-excerpt { font-size: 12px; color: var(--muted); line-height: 1.6; flex: 1; }
+.feed-cats  { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+.feed-cat   { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); }
+
+.loading { color: var(--muted); font-size: 13px; }
+.error   { color: var(--red);   font-size: 13px; }
+
+@media (max-width: 640px) {
+  main { padding: 16px 12px 48px; }
+  .sec { margin-bottom: 20px; }
+}
+@media (max-width: 1440px) {
+  .page-logo { display: none; }
+}
+@media (max-width: 700px) {
+  .timeline { grid-template-columns: 1fr 1fr; }
+  .feed-item { grid-template-columns: 1fr; }
+  .feed-img, .feed-img-placeholder { width: 100%; aspect-ratio: 16/9; }
+  .feed-content { padding: 12px; }
+}
+@media (max-width: 400px) {
+  .timeline { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; height: auto; min-height: 44px; padding: 6px 10px; gap: 6px; }
+  header h1 { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img src="/artemis.png" style="height:22px;width:auto;vertical-align:middle;margin-right:6px;border-radius:3px"> <span>Artemis</span></h1>
+  <a href="/iss.html">&#8592; Space Tracker</a>
+  <a href="/">&#127760; Home</a>
+  <div id="update-time">–</div>
+  <a href="/nasa.html" style="display:inline-flex;align-items:center;gap:5px"><img src="/nasa.png" style="height:14px;width:auto;border-radius:50%"> NASA data</a>
+</header>
+
+<main>
+<img class="page-logo" src="/artemis.png" alt="Artemis">
+
+  <!-- TIJDLIJN -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#128640; Missie-overzicht</h2>
+      <span class="sub">NASA Artemis programma — terug naar de maan</span>
+    </div>
+    <div class="sec-body">
+      <div class="timeline">
+
+        <div class="mission-card done">
+          <div class="mission-stripe stripe-done"></div>
+          <div class="mission-sub">Missie I</div>
+          <div class="mission-name">Artemis I</div>
+          <div class="mission-date">16 nov – 11 dec 2022</div>
+          <div class="mission-desc">Onbemande testvlucht van SLS en Orion. Capsule vloog 450.000 km van de aarde en passeerde de maan op 130 km afstand. Splashdown 11 december 2022.</div>
+          <span class="status-badge badge-done">&#10003; Voltooid</span>
+        </div>
+
+        <div class="mission-card done">
+          <div class="mission-stripe stripe-done"></div>
+          <div class="mission-sub">Missie II</div>
+          <div class="mission-name">Artemis II</div>
+          <div class="mission-date">April 2026</div>
+          <div class="mission-desc">Eerste bemande vlucht — vier astronauten (Reid Wiseman, Victor Glover, Christina Koch, Jeremy Hansen). Vrije-retourvlucht rond de maan zonder landing.</div>
+          <span class="status-badge badge-done">&#10003; Voltooid</span>
+        </div>
+
+        <div class="mission-card active">
+          <div class="mission-stripe stripe-active"></div>
+          <div class="mission-sub">Missie III</div>
+          <div class="mission-name">Artemis III</div>
+          <div class="mission-date">Gepland ~2027</div>
+          <div class="mission-desc">Eerste bemande maanlanding sinds Apollo 17 (1972). Astronauten landen met SpaceX Starship HLS op de Zuidpool van de maan. SLS-hardware arriveert nu bij Kennedy.</div>
+          <span class="status-badge badge-active">&#9679; In voorbereiding</span>
+        </div>
+
+        <div class="mission-card future">
+          <div class="mission-stripe stripe-future"></div>
+          <div class="mission-sub">Missie IV</div>
+          <div class="mission-name">Artemis IV</div>
+          <div class="mission-date">Gepland ~2028+</div>
+          <div class="mission-desc">Eerste missie met de Lunar Gateway — een ruimtestation in een baan om de maan. Langere verblijfsduur op het maanoppervlak en uitbreiding van de Gateway-modules.</div>
+          <span class="status-badge badge-future">&#9711; Gepland</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOG FEED -->
+  <div class="sec">
+    <div class="sec-head">
+      <h2>&#128240; NASA Artemis Blog</h2>
+      <span class="sub">Laatste updates van nasa.gov</span>
+      <a href="https://www.nasa.gov/blogs/artemis/" target="_blank" rel="noopener"
+         style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">
+        Alle berichten ↗
+      </a>
+    </div>
+    <div class="sec-body" id="feed-body">
+      <div class="loading">Laden…</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function updateClock() {
+  document.getElementById('update-time').textContent =
+    new Date().toLocaleTimeString('nl', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+function formatDate(rssDate) {
+  try {
+    const d = new Date(rssDate);
+    return d.toLocaleDateString('nl', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  } catch { return rssDate; }
+}
+
+async function loadFeed() {
+  const el = document.getElementById('feed-body');
+  try {
+    const resp = await fetch('/api/artemis/feed');
+    if (!resp.ok) throw new Error(`server ${resp.status}`);
+    let data;
+    try { data = await resp.json(); } catch(_) { throw new Error('ongeldig antwoord'); }
+
+    const items = data.items || [];
+    if (!items.length) { el.innerHTML = '<div class="loading">Geen berichten beschikbaar.</div>'; return; }
+
+    el.innerHTML = `<div class="feed-grid">${items.map(item => {
+      const img = item.image
+        ? `<img class="feed-img" src="${item.image}" alt="" loading="lazy">`
+        : `<div class="feed-img-placeholder">&#128640;</div>`;
+      const cats = (item.categories || [])
+        .map(c => `<span class="feed-cat">${c}</span>`).join('');
+      return `<a class="feed-item" href="${item.link}" target="_blank" rel="noopener">
+        ${img}
+        <div class="feed-content">
+          <div class="feed-title">${item.title}</div>
+          <div class="feed-meta">${formatDate(item.date)}${item.author ? ' — ' + item.author : ''}</div>
+          <div class="feed-excerpt">${item.excerpt}</div>
+          ${cats ? `<div class="feed-cats">${cats}</div>` : ''}
+        </div>
+      </a>`;
+    }).join('')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="error">Niet beschikbaar (${e.message})</div>`;
+  }
+}
+
+loadFeed();
+</script>
+</body>
+</html>
