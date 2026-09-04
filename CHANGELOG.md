@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-09-04
+- Replaced the Mars Rover photo source: `api.nasa.gov/mars-photos` proxies to a third-party Heroku app that has gone offline (returns an HTML "No such app" error instead of JSON). Switched to JPL's own raw-images feed (`mars.nasa.gov/rss/api`) for Perseverance, which needs no API key and returns the latest images directly instead of guessing the current Martian sol.
 - Fixed a bug where a NASA API rate-limit error (still valid JSON) was cached as if it were real data, so `/api/nasa/*` kept serving the error for the full cache TTL (up to 6 hours) instead of recovering once the rate limit reset. `_nasa_fetch()` now recognizes `{"error": ...}` responses, refuses to cache them, and falls back to the last known-good response instead.
 - Added an MIT `LICENSE`, now that the repository is public.
 - Merged the landing page into the map page — `iss.html` is now `index.html` and serves as the home page; the separate landing page was removed. Matches the same change made in `adsb-portal`. Other pages now link back with `<a href="/">` instead of `/iss.html`.

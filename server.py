@@ -164,26 +164,13 @@ def _nasa_fetch(key, url, ttl=3600, max_time=10):
 
 
 def _mars_fetch():
-    import json as _j
-    # Calculate current Martian sol — no manifest needed
-    # Perseverance Sol 0 = 2021-02-18 00:00 UTC = Unix 1613606400
-    # Martian sol = 24h 39m 35.244s = 88775.244 seconds
-    approx_sol = int((time.time() - 1613606400) / 88775.244)
-
-    # Try current sol and 2 before it (newest sol may still be empty)
-    for sol in range(approx_sol, max(1, approx_sol - 3), -1):
-        raw = _nasa_fetch(f"mars_sol_{sol}",
-            f"https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/photos?sol={sol}&page=1&api_key={NASA_KEY}",
-            21600, max_time=15)
-        if not raw:
-            continue
-        try:
-            d = _j.loads(raw)
-            if d.get("photos"):
-                return raw
-        except Exception:
-            pass
-    return None
+    # NASA's api.nasa.gov/mars-photos endpoint proxies to a third-party Heroku
+    # app that has gone offline, so we use JPL's own raw-images feed instead —
+    # no API key needed, and it returns the latest images directly (no need
+    # to guess the current Martian sol).
+    return _nasa_fetch("mars_latest",
+        "https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&num=5&page=0&order=sol+desc",
+        3600, max_time=15)
 
 
 def _artemis_fetch():
