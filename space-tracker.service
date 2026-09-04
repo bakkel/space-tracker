@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=bakkel
+Environment=PYTHONUNBUFFERED=1
 WorkingDirectory=/home/bakkel/space-tracker
 ExecStart=/usr/bin/python3 /home/bakkel/space-tracker/server.py
 Restart=on-failure
