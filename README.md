@@ -108,3 +108,7 @@ Open `http://<host>:8082` in a browser for the live map.
 1. Open the portal in **Safari** on your iPhone
 2. Tap the **share icon** (↑) → **"Add to Home Screen"**
 3. Confirm — the portal now appears as a full-screen app on your home screen
+
+## License
+
+MIT — see [LICENSE](LICENSE).
