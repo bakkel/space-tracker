@@ -77,6 +77,8 @@ At the top of `server.py` (or as environment variables, e.g. in `docker-compose.
 |---|---|---|
 | `PORT` | `8082` | Port the portal listens on |
 | `NASA_API_KEY` (env var) | `DEMO_KEY` | NASA API key |
+| `UMAMI_SCRIPT_URL` (env var) | *(empty)* | Optional: URL of your [Umami](https://umami.is) tracking script, e.g. `https://umami.example.com/script.js` |
+| `UMAMI_WEBSITE_ID` (env var) | *(empty)* | Optional: your Umami website ID. The tracking script is only added to pages when both Umami variables are set |
 
 ## Project structure
 

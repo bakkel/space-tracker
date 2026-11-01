@@ -2,7 +2,7 @@
 # Sync this project to the Pi over SSH and restart the service.
 set -euo pipefail
 
-REMOTE=flight2
+REMOTE=flight
 REMOTE_DIR=/home/bakkel/space-tracker
 SERVICE=space-tracker
 

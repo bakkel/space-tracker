@@ -9,6 +9,7 @@ import time
 import json
 import math
 import os
+import html
 from datetime import datetime, timedelta
 
 PORT       = int(os.environ.get("PORT", 8082))
@@ -19,6 +20,14 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 NASA_KEY    = os.environ.get("NASA_API_KEY", "DEMO_KEY")
 _nasa_cache = {}   # key → (bytes, timestamp)
 _tle_cache  = {}   # norad_id → (dict, timestamp)
+
+# Optional Umami analytics — only injected when both are set
+UMAMI_SCRIPT_URL = os.environ.get("UMAMI_SCRIPT_URL", "")
+UMAMI_WEBSITE_ID = os.environ.get("UMAMI_WEBSITE_ID", "")
+UMAMI_TAG = (
+    f'<script defer src="{html.escape(UMAMI_SCRIPT_URL)}" data-website-id="{html.escape(UMAMI_WEBSITE_ID)}"></script>\n'
+    if UMAMI_SCRIPT_URL and UMAMI_WEBSITE_ID else ""
+)
 
 try:
     from sgp4.api import Satrec as _Satrec, jday as _sgp4_jday
@@ -401,8 +410,27 @@ class SpaceTrackerHandler(http.server.SimpleHTTPRequestHandler):
                 "https://eonet.gsfc.nasa.gov/api/v3/events?limit=20&status=open", 3600))
         elif self.path.startswith("/api/artemis/feed"):
             self._raw_json(_artemis_fetch())
+        elif UMAMI_TAG and self._html_path():
+            self._html_with_umami(self._html_path())
         else:
             super().do_GET()
+
+    def _html_path(self):
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            path = os.path.join(path, "index.html")
+        return path if path.endswith(".html") and os.path.isfile(path) else None
+
+    def _html_with_umami(self, path):
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        body = page.replace("</body>", UMAMI_TAG + "</body>", 1).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self.wfile.write(body)
 
     def _raw_json(self, data):
         if not data:
