@@ -29,6 +29,34 @@ UMAMI_TAG = (
     if UMAMI_SCRIPT_URL and UMAMI_WEBSITE_ID else ""
 )
 
+# Optional theming. Every page has a theme switcher with the built-in "dark" and
+# "light" themes; these variables add a third, custom theme and pick the default.
+#   DEFAULT_THEME  theme for first-time visitors: dark (default), light or custom
+#   THEME_CSS_URL  stylesheet for the custom theme (styles html[data-theme="custom"])
+#   THEME_JS_URL   optional script for the custom theme, loaded at the end of <body>
+#   THEME_NAME     label of the custom theme in the switcher (default "Custom")
+#   THEME_BASE     dark or light (default): map tiles and overlays for the custom theme
+THEME_CSS_URL = os.environ.get("THEME_CSS_URL", "")
+THEME_JS_URL  = os.environ.get("THEME_JS_URL", "")
+THEME_NAME    = os.environ.get("THEME_NAME", "Custom")
+THEME_BASE    = "dark" if os.environ.get("THEME_BASE", "light").lower() == "dark" else "light"
+DEFAULT_THEME = os.environ.get("DEFAULT_THEME", "dark").lower()
+if DEFAULT_THEME not in ("dark", "light", "custom") or (DEFAULT_THEME == "custom" and not THEME_CSS_URL):
+    DEFAULT_THEME = "dark"
+_portal_config = {"defaultTheme": DEFAULT_THEME}
+if THEME_CSS_URL:
+    _portal_config["custom"] = {"name": THEME_NAME, "base": THEME_BASE}
+# Config goes first in <head> (theme.js reads it); "</" is escaped so the JSON can't close the <script>
+HEAD_START_INJECT = (
+    '<script>window.PORTAL_CONFIG=' + json.dumps(_portal_config).replace("</", "<\\/") + ';</script>\n'
+    if _portal_config != {"defaultTheme": "dark"} else ""
+)
+HEAD_INJECT = f'<link rel="stylesheet" href="{html.escape(THEME_CSS_URL)}">\n' if THEME_CSS_URL else ""
+BODY_INJECT = (
+    (f'<script defer src="{html.escape(THEME_JS_URL)}"></script>\n' if THEME_JS_URL else "")
+    + UMAMI_TAG
+)
+
 try:
     from sgp4.api import Satrec as _Satrec, jday as _sgp4_jday
     _HAS_SGP4 = True
@@ -410,8 +438,8 @@ class SpaceTrackerHandler(http.server.SimpleHTTPRequestHandler):
                 "https://eonet.gsfc.nasa.gov/api/v3/events?limit=20&status=open", 3600))
         elif self.path.startswith("/api/artemis/feed"):
             self._raw_json(_artemis_fetch())
-        elif UMAMI_TAG and self._html_path():
-            self._html_with_umami(self._html_path())
+        elif (HEAD_START_INJECT or HEAD_INJECT or BODY_INJECT) and self._html_path():
+            self._html_with_injections(self._html_path())
         else:
             super().do_GET()
 
@@ -421,10 +449,12 @@ class SpaceTrackerHandler(http.server.SimpleHTTPRequestHandler):
             path = os.path.join(path, "index.html")
         return path if path.endswith(".html") and os.path.isfile(path) else None
 
-    def _html_with_umami(self, path):
+    def _html_with_injections(self, path):
         with open(path, encoding="utf-8") as f:
             page = f.read()
-        body = page.replace("</body>", UMAMI_TAG + "</body>", 1).encode()
+        page = page.replace("<head>", "<head>\n" + HEAD_START_INJECT, 1)
+        page = page.replace("</head>", HEAD_INJECT + "</head>", 1)
+        body = page.replace("</body>", BODY_INJECT + "</body>", 1).encode()
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))

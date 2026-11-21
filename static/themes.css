@@ -1,0 +1,61 @@
+/*
+ * Built-in themes — shared by all pages, loaded after each page's own <style>.
+ * Each page's :root block is the "dark" palette; this file adds "light" and the
+ * mode-dependent overrides. A custom theme (THEME_CSS_URL) styles
+ * html[data-theme="custom"] the same way.
+ * Keep colours as 6-digit hex: the statistics charts append alpha suffixes.
+ */
+
+/* ── Light palette ── */
+html[data-theme="light"] {
+  --bg:     #f6f8fa;
+  --bg2:    #ffffff;
+  --bg3:    #eaeef2;
+  --border: #d0d7de;
+  --text:   #1f2328;
+  --muted:  #59636e;
+  --accent: #0969da;
+  --green:  #1a7f37;
+  --yellow: #9a6700;
+  --orange: #bc4c00;
+  --red:    #cf222e;
+  --emerg:  #d00000;
+  --gold:   #a87b00;
+  --purple: #8250df;
+}
+
+/* ── Theme toggle button (header) ── */
+.theme-toggle {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--muted); }
+/* When something before it already pushes right, don't add extra space */
+#update-time ~ .theme-toggle,
+#last-updated ~ .theme-toggle { margin-left: 0; }
+
+/* ── Light mode: overrides for elements with fixed dark colours ── */
+html[data-mode="light"] .leaflet-container { background: #e6e6e6; }
+html[data-mode="light"] .leaflet-tile { filter: none; }
+html[data-mode="light"] .leaflet-popup-content-wrapper { box-shadow: 0 4px 16px rgba(0, 0, 0, .15); }
+html[data-mode="light"] .plane-icon { text-shadow: 0 0 3px #fff, 0 0 2px #fff, 0 0 1px #000; }
+html[data-mode="light"] .airport-label {
+  background: rgba(255, 255, 255, .92);
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+html[data-mode="light"] #map-legend { background: rgba(255, 255, 255, .92); }
+html[data-mode="light"] tbody tr.selected { background: rgba(9, 105, 218, .10); }
+
+@media (max-width: 768px) {
+  .theme-toggle { font-size: 11px; padding: 3px 8px; }
+}

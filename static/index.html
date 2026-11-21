@@ -120,7 +120,7 @@ footer#page-footer a:hover { color: var(--text); }
   display: flex; gap: 12px; font-size: 11px;
   backdrop-filter: blur(4px);
 }
-.legend-iss { color: #ffd700; font-weight: 600; }
+.legend-iss { color: var(--gold); font-weight: 600; }
 .legend-tg  { color: #cc2233; font-weight: 600; }
 
 /* ── Leaflet overrides ── */
@@ -138,6 +138,8 @@ footer#page-footer a:hover { color: var(--text); }
   #nasa-link { flex-direction: column; gap: 8px; }
 }
 </style>
+<link rel="stylesheet" href="/themes.css">
+<script src="/theme.js"></script>
 </head>
 <body>
 
@@ -243,23 +245,32 @@ const TRAIL_MAX     = 120;   // 120 × 5 s = 10 minutes
 // ── MAP ──────────────────────────────────────────────────────────────────────
 const map = L.map('map', { zoomControl: true, worldCopyJump: true }).setView([20, 0], 2);
 
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+// Base map follows the theme's mode (dark/light) — see theme.js
+const esriTiles = (layer) =>
+  'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_' + PortalTheme.tileStyle() + '_Gray_' + layer + '/MapServer/tile/{z}/{y}/{x}';
+const baseLayer = L.tileLayer(esriTiles('Base'), {
   attribution: '&copy; Esri, HERE, Garmin, OSM',
   maxZoom: 10,
 }).addTo(map);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+const refLayer = L.tileLayer(esriTiles('Reference'), {
   maxZoom: 10,
 }).addTo(map);
+window.addEventListener('portal-themechange', () => {
+  baseLayer.setUrl(esriTiles('Base'));
+  refLayer.setUrl(esriTiles('Reference'));
+});
 
 try {
   const terminator = L.terminator({
     fillColor:   '#001428',
-    fillOpacity: 0.45,
+    fillOpacity: PortalTheme.get().mode === 'light' ? 0.2 : 0.45,
     color:       '#8b949e',
     weight:      1,
     opacity:     0.6,
   }).addTo(map);
   setInterval(() => terminator.setTime(new Date()), 60000);
+  window.addEventListener('portal-themechange', (e) =>
+    terminator.setStyle({ fillOpacity: e.detail.mode === 'light' ? 0.2 : 0.45 }));
 } catch(e) {
   console.warn('Terminator unavailable:', e);
 }
@@ -353,7 +364,7 @@ function updateMap(d) {
 
   trailGroup.clearLayers();
   splitAtDateline(trail).forEach(seg =>
-    L.polyline(seg, { color: '#ffd700', weight: 2, opacity: .45 }).addTo(trailGroup)
+    L.polyline(seg, { color: getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#ffd700', weight: 2, opacity: .45 }).addTo(trailGroup)
   );
 
   const radiusM = (d.footprint / 2) * 1000;
@@ -370,7 +381,7 @@ function updateMap(d) {
 
 function popupHTML(d) {
   return `
-    <div style="margin-bottom:4px"><b style="color:#ffd700;font-size:14px">&#128302; ISS</b></div>
+    <div style="margin-bottom:4px"><b style="color:var(--gold);font-size:14px">&#128302; ISS</b></div>
     <table style="border-spacing:0 3px;font-size:12px">
       <tr><td style="color:var(--muted);padding-right:12px">Position</td>
           <td style="font-family:monospace">${fmt(d.latitude, 4)}° / ${fmt(d.longitude, 4)}°</td></tr>
