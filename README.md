@@ -77,6 +77,13 @@ At the top of `server.py` (or as environment variables, e.g. in `docker-compose.
 |---|---|---|
 | `PORT` | `8082` | Port the portal listens on |
 | `NASA_API_KEY` (env var) | `DEMO_KEY` | NASA API key |
+| `UMAMI_SCRIPT_URL` (env var) | *(empty)* | Optional: URL of your [Umami](https://umami.is) tracking script, e.g. `https://umami.example.com/script.js` |
+| `UMAMI_WEBSITE_ID` (env var) | *(empty)* | Optional: your Umami website ID. The tracking script is only added to pages when both Umami variables are set |
+| `DEFAULT_THEME` (env var) | `dark` | Theme for first-time visitors: `dark`, `light` or `custom`. Visitors can switch themes with the button in the header; their choice is remembered in the browser |
+| `THEME_CSS_URL` (env var) | *(empty)* | Optional: stylesheet for a third, custom theme. It is only offered in the switcher when this is set. Style it under `html[data-theme="custom"]`, mainly by overriding the CSS variables (`--bg`, `--bg2`, `--bg3`, `--border`, `--text`, `--muted`, `--accent`, `--green`, …) as 6-digit hex colours |
+| `THEME_JS_URL` (env var) | *(empty)* | Optional: extra script for the custom theme, loaded at the end of every page (e.g. to add a logo to the header) |
+| `THEME_NAME` (env var) | `Custom` | Label of the custom theme in the switcher |
+| `THEME_BASE` (env var) | `light` | `light` or `dark`: which map tiles and overlay styling the custom theme builds on |
 
 ## Project structure
 

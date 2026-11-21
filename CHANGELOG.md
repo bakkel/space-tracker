@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-21
+- Added a theme switcher to the header of every page, with built-in **Dark** (the existing look, still the default) and **Light** themes. The choice is remembered per browser, and the map tiles switch along (Esri Dark/Light Gray Canvas).
+- Self-hosters can offer a third, custom theme with `THEME_CSS_URL` (plus optional `THEME_JS_URL`, `THEME_NAME`, `THEME_BASE`), and pick the default theme for new visitors with `DEFAULT_THEME`. Without these variables, the HTML is served exactly as the files on disk.
+- The ISS colour (legend, trail, popup title) uses the `--gold` CSS variable, and the day/night shading is lighter on the light map.
+
+## 2026-11-01
+- Added optional Umami analytics: when `UMAMI_SCRIPT_URL` and `UMAMI_WEBSITE_ID` are both set, `server.py` adds the tracking script to all HTML pages. Without them, no tracking script is served.
+- `deploy.sh` now uses the `flight` SSH alias; the previous `flight2` alias no longer exists.
+
 ## 2026-09-04
 - Replaced the Mars Rover photo source: `api.nasa.gov/mars-photos` proxies to a third-party Heroku app that has gone offline (returns an HTML "No such app" error instead of JSON). Switched to JPL's own raw-images feed (`mars.nasa.gov/rss/api`) for Perseverance, which needs no API key and returns the latest images directly instead of guessing the current Martian sol.
 - Fixed a bug where a NASA API rate-limit error (still valid JSON) was cached as if it were real data, so `/api/nasa/*` kept serving the error for the full cache TTL (up to 6 hours) instead of recovering once the rate limit reset. `_nasa_fetch()` now recognizes `{"error": ...}` responses, refuses to cache them, and falls back to the last known-good response instead.
